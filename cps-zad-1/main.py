@@ -1,6 +1,6 @@
 import math
 from tkinter import Tk
-from gui import show_gui
+from view.gui import show_gui
 
 def main():
     show_gui()

@@ -7,10 +7,12 @@ def base_sinus(A, T, t1, d, f):
     t = np.arange(0, d+1, 1/f)+ t1
     return A * math.sin((2 * math.pi/T) * (t - t1))
 
+# jednopolowkowe
 def sinus_rectified(A, T, t1, d, f):
     t = np.arange(0, d+1, 1/f)+ t1
     return 1/2 * A *(math.sin(2 * math.pi/T * (t - t1)) + abs(math.sin(2 * math.pi/T * (t - t1))))
 
+# dwupolowkowe
 def sinus_full_rectified(A, T, t1, d, f):
     t = np.arange(0, d+1, 1/f)+ t1
     return A * abs(math.sin(2 * math.pi/T * (t - t1)))
