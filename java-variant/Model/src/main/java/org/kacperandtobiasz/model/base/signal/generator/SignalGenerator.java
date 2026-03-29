@@ -3,7 +3,7 @@ package org.kacperandtobiasz.model.base.signal.generator;
 import org.kacperandtobiasz.model.base.signal.SignalType;
 
 
-public abstract class SignalGenerator {
+public abstract class SignalGenerator implements Cloneable {
 
     private double amplitude;
     private double startTime;
@@ -46,5 +46,14 @@ public abstract class SignalGenerator {
 
     public void setDuration(double duration) {
         this.duration = duration;
+    }
+
+    @Override
+    public SignalGenerator clone() {
+        try {
+            return (SignalGenerator) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

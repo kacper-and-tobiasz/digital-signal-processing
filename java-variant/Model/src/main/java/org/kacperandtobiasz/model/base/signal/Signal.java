@@ -88,6 +88,18 @@ public class Signal {
         return generator.getSignalType();
     }
 
+    public Signal deepCopy() {
+        Signal cloned = new Signal("Copy " + this.name, this.generator != null ? this.generator.clone() : null, this.samplingFrequency);
+        if (this.isSampled()) {
+            cloned.discreteSignal = new DiscreteSignal(
+                    this.discreteSignal.samples(), 
+                    this.discreteSignal.samplingFrequency(), 
+                    this.discreteSignal.startTime()
+            );
+        }
+        return cloned;
+    }
+
     @Override
     public String toString() {
         return name;

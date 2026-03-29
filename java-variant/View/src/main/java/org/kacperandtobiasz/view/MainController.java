@@ -138,7 +138,7 @@ public class MainController {
             }
         });
 
-        // Signal name updating logic
+        // Signal name updating logic on unfocus
         signal_name.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
             if (!isNowFocused) { 
                 Signal selected = signal_selector.getSelectionModel().getSelectedItem();
@@ -149,6 +149,19 @@ public class MainController {
                     signals.set(selectedIndex, selected);
                     signal_selector.getSelectionModel().select(selectedIndex);
                 }
+            }
+        });
+
+        signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                signal_name.setText(newVal.getName());
+                if (newVal.isSampled()) {
+                    drawSignal(newVal);
+                } else {
+                    signal_chart.getData().clear();
+                }
+            } else {
+                signal_chart.getData().clear();
             }
         });
         
@@ -260,6 +273,16 @@ public class MainController {
         }
 
         signalRepo.removeSignal(signal);
+    }
+
+    @FXML
+    private void handleCloneSignal() {
+        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        
+        Signal cloned = selected.deepCopy();
+        signalRepo.addSignal(cloned);
+        signal_selector.getSelectionModel().select(cloned);
     }
 
 }
