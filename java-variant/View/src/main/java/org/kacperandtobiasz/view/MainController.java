@@ -17,6 +17,12 @@ import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+import javafx.application.Platform;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 
 public class MainController {
 
@@ -102,6 +108,49 @@ public class MainController {
 
 //        Before creation signal has to have a name
         create_button.disableProperty().bind(signal_name.textProperty().length().lessThan(3));
+        
+        Platform.runLater(() -> {
+            Scene scene = signal_name.getScene();
+            if (scene != null) {
+                scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        scene.getRoot().requestFocus();
+                    }
+                });
+
+                scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                    Node focusOwner = scene.getFocusOwner();
+                    if (focusOwner != null && event.getTarget() instanceof Node target) {
+                        boolean isInsideFocusOwner = false;
+                        Node current = target;
+                        while (current != null) {
+                            if (current == focusOwner) {
+                                isInsideFocusOwner = true;
+                                break;
+                            }
+                            current = current.getParent();
+                        }
+                        if (!isInsideFocusOwner) {
+                            scene.getRoot().requestFocus();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Signal name updating logic
+        signal_name.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) { 
+                Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+                String currentText = signal_name.getText();
+                if (selected != null && currentText != null && currentText.length() >= 3) {
+                    selected.setName(currentText);
+                    int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
+                    signals.set(selectedIndex, selected);
+                    signal_selector.getSelectionModel().select(selectedIndex);
+                }
+            }
+        });
         
         updateControlStates(signal_type.getValue());
     }
