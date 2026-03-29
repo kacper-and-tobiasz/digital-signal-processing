@@ -36,6 +36,8 @@ public class MainController {
     @FXML
     public TextField signal_name;
     @FXML
+    public Button rename_button;
+    @FXML
     public Button clone_button;
     @FXML
     public Button create_button;
@@ -97,6 +99,30 @@ public class MainController {
         signal_type.getSelectionModel().select(SignalType.SIN);
 
         signal_type.valueProperty().addListener((obs, oldVal, newVal) -> updateControlStates(newVal));
+        
+        base_period.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal >= 0.01) {
+                double expectedFreq = 1.0 / newVal;
+                if (expectedFreq < 0.01) expectedFreq = 0.01;
+                if (signal_frequency.getValue() == null || Math.abs(signal_frequency.getValue() - expectedFreq) > 1e-6) {
+                    signal_frequency.getValueFactory().setValue(expectedFreq);
+                }
+            } else if (newVal != null && newVal < 0.01) {
+                base_period.getValueFactory().setValue(0.01);
+            }
+        });
+
+        signal_frequency.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal >= 0.01) {
+                double expectedPeriod = 1.0 / newVal;
+                if (expectedPeriod < 0.01) expectedPeriod = 0.01;
+                if (base_period.getValue() == null || Math.abs(base_period.getValue() - expectedPeriod) > 1e-6) {
+                    base_period.getValueFactory().setValue(expectedPeriod);
+                }
+            } else if (newVal != null && newVal < 0.01) {
+                signal_frequency.getValueFactory().setValue(0.01);
+            }
+        });
 
 //        If signal instance is not selected, user can't set parameters for it
         general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
@@ -115,6 +141,17 @@ public class MainController {
                     return signals.stream().anyMatch(s -> s.getName().equals(text));
                 }, signal_name.textProperty(), signals)
         );
+        
+        rename_button.disableProperty().bind(
+                Bindings.createBooleanBinding(() -> {
+                    if (signal_selector.getValue() == null) return true;
+                    String text = signal_name.getText();
+                    if (text == null || text.length() < 3) return true;
+                    return signals.stream()
+                            .filter(s -> s != signal_selector.getValue())
+                            .anyMatch(s -> s.getName().equals(text));
+                }, signal_name.textProperty(), signals, signal_selector.valueProperty())
+        );
 
         Platform.runLater(() -> {
             Scene scene = signal_name.getScene();
@@ -124,52 +161,32 @@ public class MainController {
                         scene.getRoot().requestFocus();
                     }
                 });
-
-                scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-                    Node focusOwner = scene.getFocusOwner();
-                    if (focusOwner != null && event.getTarget() instanceof Node target) {
-                        boolean isInsideFocusOwner = false;
-                        Node current = target;
-                        while (current != null) {
-                            if (current == focusOwner) {
-                                isInsideFocusOwner = true;
-                                break;
-                            }
-                            current = current.getParent();
-                        }
-                        if (!isInsideFocusOwner) {
-                            scene.getRoot().requestFocus();
-                        }
-                    }
-                });
-            }
-        });
-
-        // Signal name updating logic on unfocus
-        signal_name.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) {
-                Signal selected = signal_selector.getSelectionModel().getSelectedItem();
-                String currentText = signal_name.getText();
-                if (selected != null && currentText != null && currentText.length() >= 3) {
-                    boolean nameExists = signals.stream()
-                            .filter(s -> s != selected)
-                            .anyMatch(s -> s.getName().equals(currentText));
-
-                    if (!nameExists) {
-                        selected.setName(currentText);
-                        int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-                        signals.set(selectedIndex, selected);
-                        signal_selector.getSelectionModel().select(selectedIndex);
-                    } else {
-                        signal_name.setText(selected.getName());
-                    }
-                }
             }
         });
 
         signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 signal_name.setText(newVal.getName());
+                
+                if (newVal.getGenerator() != null) {
+                    SignalParameters params = newVal.getGenerator().getParameters();
+                    signal_type.getSelectionModel().select(newVal.getGenerator().getSignalType());
+                    
+                    amplitude.getValueFactory().setValue(params.getAmplitude());
+                    signal_start.getValueFactory().setValue(params.getStartTime());
+                    signal_duration.getValueFactory().setValue(params.getDuration());
+                    
+                    if (base_period != null) base_period.getValueFactory().setValue(params.getPeriod());
+                    if (duty_cycle != null) duty_cycle.getValueFactory().setValue(params.getDutyCycle());
+                    if (jump_time != null) jump_time.getValueFactory().setValue(params.getJumpTime());
+                    if (probability != null) probability.getValueFactory().setValue(params.getProbability());
+                    
+                    if (first_sample != null) first_sample.getValueFactory().setValue(params.getFirstSample());
+                    if (jump_sample != null) jump_sample.getValueFactory().setValue(params.getJumpSample());
+                    if (sample_length != null) sample_length.getValueFactory().setValue(params.getSampleLength());
+                }
+                if (sampling_rate != null) sampling_rate.getValueFactory().setValue(newVal.getSamplingFrequency());
+
                 if (newVal.isSampled()) {
                     drawSignal(newVal);
                 } else {
@@ -273,6 +290,7 @@ public class MainController {
 
         Signal newComputedState = SignalFactory.create(type, name, samplingRate, params);
         targetSignal.setGenerator(newComputedState.getGenerator());
+        targetSignal.setSamplingFrequency(samplingRate);
         targetSignal.sample();
 
         drawSignal(targetSignal);
@@ -286,6 +304,26 @@ public class MainController {
         }
 
         signalRepo.removeSignal(signal);
+    }
+    
+    @FXML
+    private void handleRenameSignal() {
+        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+        String currentText = signal_name.getText();
+        if (selected != null && currentText != null && currentText.length() >= 3) {
+            boolean nameExists = signals.stream()
+                    .filter(s -> s != selected)
+                    .anyMatch(s -> s.getName().equals(currentText));
+
+            if (!nameExists) {
+                selected.setName(currentText);
+                int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
+                signals.set(selectedIndex, selected);
+                signal_selector.getSelectionModel().select(selectedIndex);
+            } else {
+                signal_name.setText(selected.getName());
+            }
+        }
     }
 
     @FXML
