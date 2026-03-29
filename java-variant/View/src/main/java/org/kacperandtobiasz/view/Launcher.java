@@ -1,9 +1,9 @@
-package org.kacperandtobiasz.signalanalyzer;
+package org.kacperandtobiasz.view;
 
 import javafx.application.Application;
 
 public class Launcher {
     public static void main(String[] args) {
-        Application.launch(HelloApplication.class, args);
+        Application.launch(MainApplication.class, args);
     }
 }

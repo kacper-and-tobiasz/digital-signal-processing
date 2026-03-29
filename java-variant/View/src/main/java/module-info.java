@@ -1,8 +1,8 @@
-module org.kacperandtobiasz.signalanalyzer {
+module org.kacperandtobiasz.view {
     requires javafx.controls;
     requires javafx.fxml;
 
 
-    opens org.kacperandtobiasz.signalanalyzer to javafx.fxml;
-    exports org.kacperandtobiasz.signalanalyzer;
+    opens org.kacperandtobiasz.view to javafx.fxml;
+    exports org.kacperandtobiasz.view;
 }

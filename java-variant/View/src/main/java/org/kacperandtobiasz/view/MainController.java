@@ -1,4 +1,4 @@
-package org.kacperandtobiasz.signalanalyzer;
+package org.kacperandtobiasz.view;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
