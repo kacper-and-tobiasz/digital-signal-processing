@@ -1,6 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator.discrete;
 
 import org.kacperandtobiasz.model.base.signal.SignalType;
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 public class UnitImpulseGenerator extends DiscreteSignalGenerator {
 
@@ -22,6 +23,11 @@ public class UnitImpulseGenerator extends DiscreteSignalGenerator {
 
     public void setImpulseSampleIndex(long ns) {
         this.impulseSampleIndex = ns;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters().withJumpSample((int) impulseSampleIndex);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator.continuous.periodic;
 
 import org.kacperandtobiasz.model.base.signal.generator.continuous.ContinuousSignalGenerator;
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 public abstract class PeriodicSignalGenerator extends ContinuousSignalGenerator {
 
@@ -22,6 +23,11 @@ public abstract class PeriodicSignalGenerator extends ContinuousSignalGenerator 
 
     public void setPeriod(double period) {
         this.period = period;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters().withPeriod(period);
     }
 
     protected double phaseWithinPeriod(double time) {
