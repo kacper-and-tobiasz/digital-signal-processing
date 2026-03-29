@@ -64,9 +64,9 @@
                                                 <Region HBox.hgrow="ALWAYS" />
                                                 <Button fx:id="clone_button" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Sklonuj" />
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="create_button" mnemonicParsing="false" text="Utwórz" />
+                                                <Button fx:id="create_button" mnemonicParsing="false" onAction="#handleCreateSignal" text="Utwórz" />
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="delete_button" mnemonicParsing="false" text="Usuń" />
+                                                <Button fx:id="delete_button" mnemonicParsing="false" onAction="#handleDeleteSignal" text="Usuń" />
                                                 <Region HBox.hgrow="ALWAYS" />
                                              </children>
                                              <padding>
@@ -90,7 +90,7 @@
                                        </VBox.margin>
                                     </GridPane>
                                     <Separator prefHeight="16.0" prefWidth="313.0" />
-                                    <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
+                                    <GridPane fx:id="general_signal_settings" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="196.0" minWidth="10.0" prefWidth="177.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="186.0" />
@@ -149,7 +149,7 @@
                                           <Insets bottom="8.0" left="15.0" right="15.0" />
                                        </padding>
                                     </GridPane>
-                                    <TabPane maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="NEVER">
+                                    <TabPane fx:id="specific_signal_settings" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="NEVER">
                                       <tabs>
                                         <Tab text="Ustawienia sygnałów ciągłych">
                                           <content>

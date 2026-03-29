@@ -8,7 +8,7 @@
         <artifactId>signal-processing</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
+    <name>Model</name>
     <artifactId>Model</artifactId>
 
     <properties>
@@ -16,5 +16,13 @@
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
+        </dependency>
+    </dependencies>
 
 </project>

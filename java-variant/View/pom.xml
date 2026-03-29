@@ -4,14 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.kacperandtobiasz</groupId>
+  <parent>
+    <groupId>org.kacperandtobiasz</groupId>
+    <artifactId>signal-processing</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
   <artifactId>View</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>View</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-<junit.version>5.12.1</junit.version>  </properties>
+    <junit.version>5.12.1</junit.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -24,8 +29,7 @@
       <artifactId>javafx-fxml</artifactId>
       <version>21.0.6</version>
     </dependency>
-
-<dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.version}</version>
@@ -36,7 +40,14 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
-    </dependency>  </dependencies>
+    </dependency>
+    <dependency>
+      <groupId>org.kacperandtobiasz</groupId>
+      <artifactId>Model</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
