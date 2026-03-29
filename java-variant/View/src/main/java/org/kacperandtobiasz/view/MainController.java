@@ -23,6 +23,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.beans.binding.Bindings;
 
 public class MainController {
 
@@ -81,7 +82,7 @@ public class MainController {
     private final ObjectProperty<Signal> selectedSignal = new SimpleObjectProperty<>();
     private final StringProperty newSignalName = new SimpleStringProperty("");
 
-    public MainController(MainContext mainContext){
+    public MainController(MainContext mainContext) {
         this.context = mainContext;
         this.signalRepo = mainContext.signalRepository();
 
@@ -89,12 +90,12 @@ public class MainController {
     }
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         signal_selector.setItems(signals);
 
         signal_type.getItems().addAll(SignalType.values());
         signal_type.getSelectionModel().select(SignalType.SIN);
-        
+
         signal_type.valueProperty().addListener((obs, oldVal, newVal) -> updateControlStates(newVal));
 
 //        If signal instance is not selected, user can't set parameters for it
@@ -107,8 +108,14 @@ public class MainController {
         delete_button.disableProperty().bind(signal_selector.valueProperty().isNull());
 
 //        Before creation signal has to have a name
-        create_button.disableProperty().bind(signal_name.textProperty().length().lessThan(3));
-        
+        create_button.disableProperty().bind(
+                Bindings.createBooleanBinding(() -> {
+                    String text = signal_name.getText();
+                    if (text == null || text.length() < 3) return true;
+                    return signals.stream().anyMatch(s -> s.getName().equals(text));
+                }, signal_name.textProperty(), signals)
+        );
+
         Platform.runLater(() -> {
             Scene scene = signal_name.getScene();
             if (scene != null) {
@@ -140,14 +147,22 @@ public class MainController {
 
         // Signal name updating logic on unfocus
         signal_name.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) { 
+            if (!isNowFocused) {
                 Signal selected = signal_selector.getSelectionModel().getSelectedItem();
                 String currentText = signal_name.getText();
                 if (selected != null && currentText != null && currentText.length() >= 3) {
-                    selected.setName(currentText);
-                    int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-                    signals.set(selectedIndex, selected);
-                    signal_selector.getSelectionModel().select(selectedIndex);
+                    boolean nameExists = signals.stream()
+                            .filter(s -> s != selected)
+                            .anyMatch(s -> s.getName().equals(currentText));
+
+                    if (!nameExists) {
+                        selected.setName(currentText);
+                        int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
+                        signals.set(selectedIndex, selected);
+                        signal_selector.getSelectionModel().select(selectedIndex);
+                    } else {
+                        signal_name.setText(selected.getName());
+                    }
                 }
             }
         });
@@ -164,17 +179,17 @@ public class MainController {
                 signal_chart.getData().clear();
             }
         });
-        
+
         updateControlStates(signal_type.getValue());
     }
 
     private void updateControlStates(SignalType type) {
         if (type == null) return;
-        
-        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT || 
-                             type == SignalType.SIN_FULL_RECT || type == SignalType.RECT || 
-                             type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
-                             
+
+        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT ||
+                type == SignalType.SIN_FULL_RECT || type == SignalType.RECT ||
+                type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
+
         boolean usesDutyCycle = type == SignalType.RECT || type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
         boolean usesJumpTime = type == SignalType.UNIT_JUMP;
         boolean usesProbability = type == SignalType.IMPULSE_NOISE;
@@ -183,14 +198,14 @@ public class MainController {
         base_period.setDisable(!usesPeriod);
         signal_frequency.setDisable(!usesPeriod);
         duty_cycle.setDisable(!usesDutyCycle);
-        if(jump_time != null) jump_time.setDisable(!usesJumpTime);
-        if(probability != null) probability.setDisable(!usesProbability);
-        
-        if(first_sample != null) first_sample.setDisable(!usesDiscreteParams);
-        if(jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
-        if(sample_length != null) sample_length.setDisable(!usesDiscreteParams);
+        if (jump_time != null) jump_time.setDisable(!usesJumpTime);
+        if (probability != null) probability.setDisable(!usesProbability);
+
+        if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
+        if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
+        if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
     }
-    
+
     private void drawSignal(Signal signal) {
         signal_chart.getData().clear();
         if (signal == null || !signal.isSampled()) {
@@ -208,40 +223,38 @@ public class MainController {
     }
 
     @FXML
-    private void handleCreateSignal(){
-        if(signal_name.textProperty().length().lessThan(3).get()){
-            throw new IllegalArgumentException("Signal name can't be longer than 3 characters");
-        }
-        
+    private void handleCreateSignal() {
+        String newName = signal_name.getText();
+
         SignalType type = signal_type.getValue();
         if (type == null) {
             throw new IllegalArgumentException("Signal type must be selected");
         }
 
-        Signal signal = new Signal(signal_name.getText(), null, 100.0);
+        Signal signal = new Signal(newName, null, 100.0);
 
         signalRepo.addSignal(signal);
         signal_selector.getSelectionModel().select(signal);
     }
-    
+
     @FXML
     private void handleGenerateSignal() {
         Signal targetSignal = signal_selector.getSelectionModel().getSelectedItem();
         if (targetSignal == null) return;
-        
+
         SignalType type = signal_type.getValue();
         if (type == null) {
             throw new IllegalArgumentException("Signal type must be selected");
         }
 
-        String name = targetSignal.getName(); 
+        String name = targetSignal.getName();
         double amp = amplitude.getValue() != null ? amplitude.getValue() : 1.0;
         double start = signal_start.getValue() != null ? signal_start.getValue() : 0.0;
         double dur = signal_duration.getValue() != null ? signal_duration.getValue() : 1.0;
         double period = base_period.getValue() != null ? base_period.getValue() : 1.0;
         double duty = duty_cycle.getValue() != null ? duty_cycle.getValue() : 0.5;
         double samplingRate = sampling_rate.getValue() != null ? sampling_rate.getValue() : 100.0;
-        
+
         double jump = jump_time.getValue() != null ? jump_time.getValue() : 0.0;
         double prob = probability.getValue() != null ? probability.getValue() : 0.5;
 
@@ -250,13 +263,13 @@ public class MainController {
         int sampLen = (sample_length != null && sample_length.getValue() != null) ? sample_length.getValue() : 100;
 
         SignalParameters params = new SignalParameters(amp, start, dur)
-            .withPeriod(period)
-            .withDutyCycle(duty)
-            .withJumpTime(jump)
-            .withProbability(prob)
-            .withFirstSample(firstSamp)
-            .withJumpSample(jumpSamp)
-            .withSampleLength(sampLen);
+                .withPeriod(period)
+                .withDutyCycle(duty)
+                .withJumpTime(jump)
+                .withProbability(prob)
+                .withFirstSample(firstSamp)
+                .withJumpSample(jumpSamp)
+                .withSampleLength(sampLen);
 
         Signal newComputedState = SignalFactory.create(type, name, samplingRate, params);
         targetSignal.setGenerator(newComputedState.getGenerator());
@@ -266,7 +279,7 @@ public class MainController {
     }
 
     @FXML
-    private void handleDeleteSignal(){
+    private void handleDeleteSignal() {
         Signal signal = signal_selector.getSelectionModel().getSelectedItem();
         if (signal == null) {
             throw new IllegalArgumentException("Signal is null, so it cannot be deleted");
@@ -279,7 +292,7 @@ public class MainController {
     private void handleCloneSignal() {
         Signal selected = signal_selector.getSelectionModel().getSelectedItem();
         if (selected == null) return;
-        
+
         Signal cloned = selected.deepCopy();
         signalRepo.addSignal(cloned);
         signal_selector.getSelectionModel().select(cloned);
