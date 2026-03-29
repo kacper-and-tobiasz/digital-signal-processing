@@ -34,23 +34,23 @@ public class MainController {
     @FXML
     public ComboBox<SignalType> signal_type;
     @FXML
-    public Spinner<Float> signal_start;
+    public Spinner<Double> signal_start;
     @FXML
-    public Spinner<Float> signal_duration;
+    public Spinner<Double> signal_duration;
     @FXML
-    public Spinner<Float> amplitude;
+    public Spinner<Double> amplitude;
     @FXML
-    public Spinner<Integer> sampling_rate;
+    public Spinner<Double> sampling_rate;
     @FXML
-    public Spinner<Float> base_period;
+    public Spinner<Double> base_period;
     @FXML
-    public Spinner<Float> duty_cycle;
+    public Spinner<Double> duty_cycle;
     @FXML
-    public Spinner<Float> signal_frequency;
+    public Spinner<Double> signal_frequency;
     @FXML
-    public Spinner<Float> jump_time;
+    public Spinner<Double> jump_time;
     @FXML
-    public Spinner<Float> probability;
+    public Spinner<Double> probability;
     @FXML
     public Spinner<Integer> first_sample;
     @FXML
