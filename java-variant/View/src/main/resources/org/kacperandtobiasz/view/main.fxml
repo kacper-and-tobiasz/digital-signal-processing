@@ -17,6 +17,9 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="1.7976931348623157E308" minHeight="600.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.kacperandtobiasz.view.MainController">
@@ -38,6 +41,7 @@
                                       </columnConstraints>
                                       <rowConstraints>
                                           <RowConstraints vgrow="SOMETIMES" />
+                                        <RowConstraints vgrow="SOMETIMES" />
                                         <RowConstraints vgrow="SOMETIMES" />
                                         <RowConstraints vgrow="SOMETIMES" />
                                         <RowConstraints vgrow="SOMETIMES" />
@@ -73,6 +77,11 @@
                                                 <Insets bottom="12.0" top="12.0" />
                                              </padding>
                                           </HBox>
+                                          <Button fx:id="generate_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGenerateSignal" text="Generuj, spróbkuj i narysuj" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Button>
                                           <Label maxWidth="1.7976931348623157E308" text="Wybór sygnału" textOverrun="WORD_ELLIPSIS" GridPane.columnSpan="2">
                                              <font>
                                                 <Font name="System Bold" size="16.0" />
@@ -276,7 +285,18 @@
                               </VBox>
                            </children>
                         </AnchorPane>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" />
+                      <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <ScatterChart fx:id="signal_chart" animated="false" legendVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <xAxis>
+                                  <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis label="Amplituda" side="LEFT" />
+                                </yAxis>
+                              </ScatterChart>
+                           </children>
+                      </AnchorPane>
                     </items>
                   </SplitPane>
                </content>

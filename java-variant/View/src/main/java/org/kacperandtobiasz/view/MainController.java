@@ -14,6 +14,9 @@ import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.model.base.signal.SignalFactory;
 import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
+import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
 
 public class MainController {
 
@@ -31,6 +34,8 @@ public class MainController {
     public Button create_button;
     @FXML
     public Button delete_button;
+    @FXML
+    public Button generate_button;
     @FXML
     public ComboBox<SignalType> signal_type;
     @FXML
@@ -57,6 +62,9 @@ public class MainController {
     public Spinner<Integer> jump_sample;
     @FXML
     public Spinner<Integer> sample_length;
+
+    @FXML
+    public ScatterChart<Number, Number> signal_chart;
 
     @FXML
     public GridPane general_signal_settings;
@@ -86,6 +94,7 @@ public class MainController {
 //        If signal instance is not selected, user can't set parameters for it
         general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
+        generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
 
 //        Can't clone or delete something that isn't there
         clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
@@ -119,6 +128,22 @@ public class MainController {
         if(jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
         if(sample_length != null) sample_length.setDisable(!usesDiscreteParams);
     }
+    
+    private void drawSignal(Signal signal) {
+        signal_chart.getData().clear();
+        if (signal == null || !signal.isSampled()) {
+            return;
+        }
+
+        DiscreteSignal ds = signal.getDiscreteSignal();
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+
+        for (int i = 0; i < ds.getSampleCount(); i++) {
+            series.getData().add(new XYChart.Data<>(ds.getTimeAtIndex(i), ds.getSample(i)));
+        }
+
+        signal_chart.getData().add(series);
+    }
 
     @FXML
     private void handleCreateSignal(){
@@ -131,7 +156,23 @@ public class MainController {
             throw new IllegalArgumentException("Signal type must be selected");
         }
 
-        String name = signal_name.getText();
+        Signal signal = new Signal(signal_name.getText(), null, 100.0);
+
+        signalRepo.addSignal(signal);
+        signal_selector.getSelectionModel().select(signal);
+    }
+    
+    @FXML
+    private void handleGenerateSignal() {
+        Signal targetSignal = signal_selector.getSelectionModel().getSelectedItem();
+        if (targetSignal == null) return;
+        
+        SignalType type = signal_type.getValue();
+        if (type == null) {
+            throw new IllegalArgumentException("Signal type must be selected");
+        }
+
+        String name = targetSignal.getName(); 
         double amp = amplitude.getValue() != null ? amplitude.getValue() : 1.0;
         double start = signal_start.getValue() != null ? signal_start.getValue() : 0.0;
         double dur = signal_duration.getValue() != null ? signal_duration.getValue() : 1.0;
@@ -155,10 +196,11 @@ public class MainController {
             .withJumpSample(jumpSamp)
             .withSampleLength(sampLen);
 
-        Signal signal = SignalFactory.create(type, name, samplingRate, params);
+        Signal newComputedState = SignalFactory.create(type, name, samplingRate, params);
+        targetSignal.setGenerator(newComputedState.getGenerator());
+        targetSignal.sample();
 
-        signalRepo.addSignal(signal);
-        signal_selector.getSelectionModel().select(signal);
+        drawSignal(targetSignal);
     }
 
     @FXML
