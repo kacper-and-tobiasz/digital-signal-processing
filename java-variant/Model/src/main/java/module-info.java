@@ -1,4 +1,6 @@
 module org.kacperandtobiasz.model {
     requires org.apache.commons.lang3;
-    exports org.kacperandtobiasz.model;
+    exports org.kacperandtobiasz.model.base;
+    exports org.kacperandtobiasz.model.base.signal;
+    exports org.kacperandtobiasz.model.base.signal.generator;
 }

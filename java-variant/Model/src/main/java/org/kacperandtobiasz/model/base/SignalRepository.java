@@ -1,4 +1,6 @@
-package org.kacperandtobiasz.model;
+package org.kacperandtobiasz.model.base;
+
+import org.kacperandtobiasz.model.base.signal.Signal;
 
 import java.util.*;
 

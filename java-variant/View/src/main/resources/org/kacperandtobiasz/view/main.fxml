@@ -245,10 +245,23 @@
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Spinner fx:id="sampling_rate" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
                                                             <Label text="Częstotliwość próbkowania (f):" />
+                                                            <Label text="Czas skoku/impulsu (t_s):" GridPane.rowIndex="1" />
+                                                            <Spinner fx:id="jump_time" editable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <Label text="Prawdopodobieństwo (p):" GridPane.rowIndex="2" />
+                                                            <Spinner fx:id="probability" editable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <Label text="Numer pierwszej próbki (n_1):" GridPane.rowIndex="3" />
+                                                            <Spinner fx:id="first_sample" editable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <Label text="Próbka skoku amplitudy (n_s):" GridPane.rowIndex="4" />
+                                                            <Spinner fx:id="jump_sample" editable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <Label text="Liczba próbek (l):" GridPane.rowIndex="5" />
+                                                            <Spinner fx:id="sample_length" editable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                                          </children>
                                                          <padding>
                                                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
