@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kacperandtobiasz.model.base.signal.generator.SignalGenerator;
 
 import java.util.UUID;
+import java.util.function.DoubleBinaryOperator;
 
 public class Signal {
     private final UUID id;
@@ -22,12 +23,19 @@ public class Signal {
         this.samplingFrequency = samplingFrequency;
     }
 
+    public Signal(String name, DiscreteSignal discreteSignal) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.discreteSignal = discreteSignal;
+        this.samplingFrequency = discreteSignal.samplingFrequency();
+        this.generator = null;
+    }
+
     public static Signal sampled(String name, SignalGenerator generator, double samplingFrequency) {
         Signal s = new Signal(name, generator, samplingFrequency);
         s.sample();
         return s;
     }
-
 
     public void sample() {
         double t1 = generator.getStartTime();
@@ -42,6 +50,93 @@ public class Signal {
 
         this.discreteSignal = new DiscreteSignal(samples, samplingFrequency, t1);
     }
+
+    public Signal computeOperation(String outputSignalName, Signal other, DoubleBinaryOperator operator){
+        if(other == null){
+            throw new IllegalArgumentException("Cannot compute operation with null signal");
+        }
+        DiscreteSignal sig1 = this.discreteSignal;
+        DiscreteSignal sig2 = other.discreteSignal;
+
+        if (sig1 == null || sig2 == null) {
+            throw new IllegalStateException("Both signals must be sampled before addition.");
+        }
+        if (sig1.samplingFrequency() != sig2.samplingFrequency()) {
+            throw new IllegalArgumentException("Signals must have the same sampling frequency");
+        }
+
+        int n = Math.min(sig1.samples().length, sig2.samples().length);
+        double[] samples = new double[n];
+        for (int i = 0; i < n ; i++) {
+            samples[i] = operator.applyAsDouble(sig1.samples()[i], sig2.samples()[i]);
+        }
+
+        DiscreteSignal sum = new DiscreteSignal(samples, sig1.samplingFrequency(), Math.min(sig1.startTime(), sig2.startTime()));
+        String name = outputSignalName == null ? this.name + " x " + other.name : outputSignalName;
+        return new Signal(name, sum);
+    }
+
+    public Signal add(String outputSignalName, Signal other){
+        DoubleBinaryOperator addition = (a, b) -> a + b;
+        return computeOperation(outputSignalName, other, addition);
+    }
+
+
+    public Signal subtract(String outputSignalName, Signal other){
+        DoubleBinaryOperator subtraction = (a, b) -> a - b;
+        return computeOperation(outputSignalName, other, subtraction);
+    }
+
+    public Signal multiply(String outputSignalName, Signal other){
+        DoubleBinaryOperator multiplication = (a, b) -> a * b;
+        return computeOperation(outputSignalName, other, multiplication);
+    }
+
+    public Signal divide(String outputSignalName, Signal other){
+        DoubleBinaryOperator division = (a, b) -> b == 0 ? 0 : a/b;
+            return computeOperation(outputSignalName, other, division);
+    }
+
+
+    public double mean() {
+        double sum = 0;
+        for (double sample : discreteSignal.samples()) {
+            sum += sample;
+        }
+        return sum / discreteSignal.samples().length;
+    }
+
+    public double absoluteMean() {
+        double sum = 0;
+        for (double sample : discreteSignal.samples()) {
+            sum += Math.abs(sample);
+        }
+        return sum / discreteSignal.samples().length;
+    }
+
+    public double averagePower() {
+        double sum = 0;
+        for (double sample : discreteSignal.samples()) {
+            sum += sample * sample;
+        }
+        return sum / discreteSignal.samples().length;
+    }
+
+    public double rms() {
+        return Math.sqrt(averagePower());
+    }
+
+    public double variance() {
+        double[] x = getDiscreteSignal().samples();
+        double mean = mean();
+        double sum = 0;
+        for (double sample : discreteSignal.samples()) {
+            sum += (sample - mean) * (sample - mean);
+        }
+        return sum / discreteSignal.samples().length;
+    }
+
+    
 
     public UUID getId() {
         return id;
