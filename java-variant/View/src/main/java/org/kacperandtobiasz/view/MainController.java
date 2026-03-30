@@ -20,15 +20,11 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.beans.binding.Bindings;
 
 public class MainController {
-
-    private final MainContext context;
     private final SignalRepository signalRepo;
 
 
@@ -75,6 +71,8 @@ public class MainController {
 
     @FXML
     public ScatterChart<Number, Number> signal_chart;
+    @FXML
+    public BarChart signal_bar_chart;
 
     @FXML
     public GridPane general_signal_settings;
@@ -82,17 +80,15 @@ public class MainController {
     public VBox specific_signal_settings;
 
     private final ObservableList<Signal> signals = FXCollections.observableArrayList();
-    private final ObjectProperty<Signal> selectedSignal = new SimpleObjectProperty<>();
-    private final StringProperty newSignalName = new SimpleStringProperty("");
-    public BarChart signal_bar_chart;
 
     public MainController(MainContext mainContext) {
-        this.context = mainContext;
         this.signalRepo = mainContext.signalRepository();
 
+        // Replacing repo inner list to make data binding possible.
         this.signalRepo.setBackingList(signals);
     }
 
+    // Called after scene graph has been loaded and objects are accessible for post-processing.
     @FXML
     private void initialize() {
         signal_selector.setItems(signals);
