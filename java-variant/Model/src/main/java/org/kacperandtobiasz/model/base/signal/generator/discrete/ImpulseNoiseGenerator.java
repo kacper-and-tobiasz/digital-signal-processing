@@ -1,6 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator.discrete;
 
 import org.kacperandtobiasz.model.base.signal.SignalType;
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 import java.util.Random;
 
@@ -9,8 +10,8 @@ public class ImpulseNoiseGenerator extends DiscreteSignalGenerator {
     private double probability;
     private final Random random;
 
-    public ImpulseNoiseGenerator(double amplitude, double startTime, double duration, double samplingFrequency, double probability) {
-        super(amplitude, startTime, duration, samplingFrequency, Math.round(startTime * samplingFrequency), Math.round(duration * samplingFrequency));
+    public ImpulseNoiseGenerator(double amplitude, long firstSampleIndex, long sampleCount, double samplingFrequency, double probability) {
+        super(amplitude, firstSampleIndex / samplingFrequency, sampleCount / samplingFrequency, samplingFrequency, firstSampleIndex, sampleCount);
         this.probability = probability;
         this.random = new Random();
     }
@@ -27,6 +28,11 @@ public class ImpulseNoiseGenerator extends DiscreteSignalGenerator {
 
     public void setProbability(double p) {
         this.probability = p;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters().withProbability(probability);
     }
 
     @Override

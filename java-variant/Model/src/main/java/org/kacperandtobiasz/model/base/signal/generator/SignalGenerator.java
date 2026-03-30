@@ -1,7 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator;
 
 import org.kacperandtobiasz.model.base.signal.SignalType;
-
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 public abstract class SignalGenerator implements Cloneable {
 
@@ -21,6 +21,9 @@ public abstract class SignalGenerator implements Cloneable {
 
     public abstract SignalType getSignalType();
 
+    public SignalParameters getParameters() {
+        return new SignalParameters(getAmplitude(), getStartTime(), getDuration());
+    }
 
     public abstract double getValue(double time);
 

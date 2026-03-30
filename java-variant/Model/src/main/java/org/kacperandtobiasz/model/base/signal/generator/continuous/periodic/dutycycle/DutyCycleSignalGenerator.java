@@ -1,6 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator.continuous.periodic.dutycycle;
 
 import org.kacperandtobiasz.model.base.signal.generator.continuous.periodic.PeriodicSignalGenerator;
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 public abstract class DutyCycleSignalGenerator extends PeriodicSignalGenerator {
 
@@ -22,5 +23,10 @@ public abstract class DutyCycleSignalGenerator extends PeriodicSignalGenerator {
 
     public void setDutyCycle(double dutyCycle) {
         this.dutyCycle = dutyCycle;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters().withDutyCycle(dutyCycle);
     }
 }

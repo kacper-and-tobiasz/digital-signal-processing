@@ -1,5 +1,6 @@
 package org.kacperandtobiasz.model.base.signal.generator.continuous;
 
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
 
 public class UnitStepGenerator extends ContinuousSignalGenerator {
@@ -27,6 +28,11 @@ public class UnitStepGenerator extends ContinuousSignalGenerator {
     @Override
     public SignalType getSignalType() {
         return SignalType.UNIT_JUMP;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters().withJumpTime(stepTime);
     }
 
     @Override

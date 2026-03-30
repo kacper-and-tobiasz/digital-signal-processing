@@ -1,6 +1,7 @@
 package org.kacperandtobiasz.model.base.signal.generator.discrete;
 
 import org.kacperandtobiasz.model.base.signal.generator.SignalGenerator;
+import org.kacperandtobiasz.model.base.signal.SignalParameters;
 
 public abstract class DiscreteSignalGenerator extends SignalGenerator {
 
@@ -44,6 +45,13 @@ public abstract class DiscreteSignalGenerator extends SignalGenerator {
 
     public void setSampleCount(long l) {
         this.sampleCount = l;
+    }
+
+    @Override
+    public SignalParameters getParameters() {
+        return super.getParameters()
+            .withFirstSample((int) firstSampleIndex)
+            .withSampleLength((int) sampleCount);
     }
 
     protected long timeToIndex(double time) {

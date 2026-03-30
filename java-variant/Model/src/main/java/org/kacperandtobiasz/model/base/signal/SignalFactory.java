@@ -43,7 +43,7 @@ public class SignalFactory {
             case TRIAN -> new TriangularWaveGenerator(amplitude, startTime, duration, period, dutyCycle);
             case UNIT_JUMP -> new UnitStepGenerator(amplitude, startTime, duration, jumpTime);
             case UNIT_IMPULSE -> new UnitImpulseGenerator(amplitude, jumpSample, firstSample, sampleLength, samplingFrequency);
-            case IMPULSE_NOISE -> new ImpulseNoiseGenerator(amplitude, startTime, duration, samplingFrequency, probability);
+            case IMPULSE_NOISE -> new ImpulseNoiseGenerator(amplitude, firstSample, sampleLength, samplingFrequency, probability);
             default -> throw new UnsupportedOperationException("Generator for " + type + " is not yet implemented.");
         };
 
