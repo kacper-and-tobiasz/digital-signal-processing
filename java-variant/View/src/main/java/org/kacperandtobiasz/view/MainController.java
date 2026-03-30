@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.kacperandtobiasz.model.base.SignalRepository;
@@ -78,11 +79,12 @@ public class MainController {
     @FXML
     public GridPane general_signal_settings;
     @FXML
-    public TabPane specific_signal_settings;
+    public VBox specific_signal_settings;
 
     private final ObservableList<Signal> signals = FXCollections.observableArrayList();
     private final ObjectProperty<Signal> selectedSignal = new SimpleObjectProperty<>();
     private final StringProperty newSignalName = new SimpleStringProperty("");
+    public BarChart signal_bar_chart;
 
     public MainController(MainContext mainContext) {
         this.context = mainContext;
