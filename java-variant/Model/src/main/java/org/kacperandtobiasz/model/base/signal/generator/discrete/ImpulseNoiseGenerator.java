@@ -10,8 +10,8 @@ public class ImpulseNoiseGenerator extends DiscreteSignalGenerator {
     private double probability;
     private final Random random;
 
-    public ImpulseNoiseGenerator(double amplitude, double startTime, double duration, double samplingFrequency, double probability) {
-        super(amplitude, startTime, duration, samplingFrequency, Math.round(startTime * samplingFrequency), Math.round(duration * samplingFrequency));
+    public ImpulseNoiseGenerator(double amplitude, long firstSampleIndex, long sampleCount, double samplingFrequency, double probability) {
+        super(amplitude, firstSampleIndex / samplingFrequency, sampleCount / samplingFrequency, samplingFrequency, firstSampleIndex, sampleCount);
         this.probability = probability;
         this.random = new Random();
     }

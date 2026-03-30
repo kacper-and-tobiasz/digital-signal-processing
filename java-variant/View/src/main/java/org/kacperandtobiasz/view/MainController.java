@@ -173,8 +173,8 @@ public class MainController {
                     signal_type.getSelectionModel().select(newVal.getGenerator().getSignalType());
                     
                     amplitude.getValueFactory().setValue(params.getAmplitude());
-                    signal_start.getValueFactory().setValue(params.getStartTime());
-                    signal_duration.getValueFactory().setValue(params.getDuration());
+                    if (signal_start != null) signal_start.getValueFactory().setValue(params.getStartTime());
+                    if (signal_duration != null) signal_duration.getValueFactory().setValue(params.getDuration());
                     
                     if (base_period != null) base_period.getValueFactory().setValue(params.getPeriod());
                     if (duty_cycle != null) duty_cycle.getValueFactory().setValue(params.getDutyCycle());
@@ -211,12 +211,16 @@ public class MainController {
         boolean usesJumpTime = type == SignalType.UNIT_JUMP;
         boolean usesProbability = type == SignalType.IMPULSE_NOISE;
         boolean usesDiscreteParams = type == SignalType.UNIT_IMPULSE || type == SignalType.IMPULSE_NOISE;
+        boolean usesContinuousParams = !usesDiscreteParams;
 
         base_period.setDisable(!usesPeriod);
         signal_frequency.setDisable(!usesPeriod);
         duty_cycle.setDisable(!usesDutyCycle);
         if (jump_time != null) jump_time.setDisable(!usesJumpTime);
         if (probability != null) probability.setDisable(!usesProbability);
+
+        if (signal_start != null) signal_start.setDisable(!usesContinuousParams);
+        if (signal_duration != null) signal_duration.setDisable(!usesContinuousParams);
 
         if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
         if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
@@ -266,8 +270,8 @@ public class MainController {
 
         String name = targetSignal.getName();
         double amp = amplitude.getValue() != null ? amplitude.getValue() : 1.0;
-        double start = signal_start.getValue() != null ? signal_start.getValue() : 0.0;
-        double dur = signal_duration.getValue() != null ? signal_duration.getValue() : 1.0;
+        double start = (signal_start != null && signal_start.getValue() != null) ? signal_start.getValue() : 0.0;
+        double dur = (signal_duration != null && signal_duration.getValue() != null) ? signal_duration.getValue() : 1.0;
         double period = base_period.getValue() != null ? base_period.getValue() : 1.0;
         double duty = duty_cycle.getValue() != null ? duty_cycle.getValue() : 0.5;
         double samplingRate = sampling_rate.getValue() != null ? sampling_rate.getValue() : 100.0;

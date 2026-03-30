@@ -127,14 +127,6 @@
                                              <GridPane.margin>
                                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                              </GridPane.margin></Label>
-                                          <Label text="Czas początkowy (t_1):" GridPane.rowIndex="3">
-                                             <GridPane.margin>
-                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                                             </GridPane.margin></Label>
-                                          <Label text="Czas trwania sygnału (d):" GridPane.rowIndex="4">
-                                             <GridPane.margin>
-                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                                             </GridPane.margin></Label>
                                           <Label text="Typ sygnału:" GridPane.rowIndex="1">
                                              <GridPane.margin>
                                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
@@ -145,14 +137,6 @@
                                              </GridPane.margin>
                                           </ComboBox>
                                           <Spinner fx:id="amplitude" editable="true" initialValue="1.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                             <GridPane.margin>
-                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                                             </GridPane.margin></Spinner>
-                                          <Spinner fx:id="signal_start" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                             <GridPane.margin>
-                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                                             </GridPane.margin></Spinner>
-                                          <Spinner fx:id="signal_duration" editable="true" initialValue="5.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                              <GridPane.margin>
                                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                              </GridPane.margin></Spinner>
@@ -172,34 +156,6 @@
                                     <TabPane fx:id="specific_signal_settings" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="NEVER">
                                       <tabs>
                                         <Tab text="Ustawienia sygnałów ciągłych">
-                                          <content>
-                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                   <children>
-                                                      <GridPane>
-                                                        <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                        </columnConstraints>
-                                                        <rowConstraints>
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                        </rowConstraints>
-                                                      </GridPane>
-                                                      <GridPane>
-                                                        <columnConstraints>
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                        </columnConstraints>
-                                                        <rowConstraints>
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                        </rowConstraints>
-                                                      </GridPane>
-                                                   </children>
-                                                </AnchorPane>
-                                          </content>
                                              <content>
                                                 <AnchorPane maxWidth="1.7976931348623157E308">
                                                    <children>
@@ -209,6 +165,8 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
+                                                          <RowConstraints vgrow="SOMETIMES" />
+                                                          <RowConstraints vgrow="SOMETIMES" />
                                                           <RowConstraints vgrow="SOMETIMES" />
                                                           <RowConstraints vgrow="SOMETIMES" />
                                                           <RowConstraints vgrow="SOMETIMES" />
@@ -240,6 +198,24 @@
                                                                </GridPane.margin>
                                                             </Label>
                                                             <Spinner fx:id="signal_frequency" amountToStepBy="0.1" editable="true" initialValue="1.0" max="100.0" maxWidth="1.7976931348623157E308" min="0.01" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                               <GridPane.margin>
+                                                                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                                               </GridPane.margin>
+                                                            </Spinner>
+                                                            <Label text="Czas początkowy (t_1):" GridPane.rowIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                                               </GridPane.margin></Label>
+                                                            <Spinner fx:id="signal_start" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                                               </GridPane.margin>
+                                                            </Spinner>
+                                                            <Label text="Czas trwania sygnału (d):" GridPane.rowIndex="4">
+                                                               <GridPane.margin>
+                                                                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                                               </GridPane.margin></Label>
+                                                            <Spinner fx:id="signal_duration" editable="true" initialValue="5.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                                                <GridPane.margin>
                                                                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                </GridPane.margin>
