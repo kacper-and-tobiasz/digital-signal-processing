@@ -563,7 +563,30 @@
                                     </TitledPane>
                                     <TitledPane animated="false" text="Ustawienia wykresów">
                                        <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                             <children>
+                                                <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <GridPane>
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label text="Ilość przedziałów histogramu:" />
+                                                            <Slider fx:id="result_histogram_bins_slider" max="40.0" min="5.0" value="10.0" blockIncrement="1.0" majorTickUnit="5.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1" />
+                                                         </children>
+                                                         <padding>
+                                                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                                         </padding>
+                                                      </GridPane>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
                                        </content>
                                     </TitledPane>
                                  </panes>

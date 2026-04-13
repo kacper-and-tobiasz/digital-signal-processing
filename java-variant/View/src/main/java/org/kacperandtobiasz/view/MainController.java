@@ -83,6 +83,8 @@ public class MainController {
     @FXML
     public Slider histogram_bins_slider;
     @FXML
+    public Slider result_histogram_bins_slider;
+    @FXML
     public Label stat_mean;
     @FXML
     public Label stat_abs_mean;
@@ -289,6 +291,11 @@ public class MainController {
                 if (currentSignal != null && currentSignal.isSampled()) {
                     drawSignal(currentSignal, signal_chart, signal_bar_chart);
                 }
+            });
+        }
+        
+        if (result_histogram_bins_slider != null) {
+            result_histogram_bins_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
                 if (lastOperationResult != null && lastOperationResult.isSampled()) {
                     drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
                 }
@@ -382,7 +389,13 @@ public class MainController {
 
         if (barChart != null) {
             // Histogram logic
-            int bins = histogram_bins_slider != null ? (int) histogram_bins_slider.getValue() : 10;
+            int bins = 10;
+            if (barChart == signal_bar_chart && histogram_bins_slider != null) {
+                bins = (int) histogram_bins_slider.getValue();
+            } else if (barChart == result_signal_barchart && result_histogram_bins_slider != null) {
+                bins = (int) result_histogram_bins_slider.getValue();
+            }
+            
             if (bins <= 0) bins = 10;
 
             int[] counts = new int[bins];
