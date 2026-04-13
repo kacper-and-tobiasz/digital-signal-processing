@@ -10,11 +10,16 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.io.IOException;
+import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.model.base.SignalRepository;
 import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.model.base.signal.SignalFactory;
 import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
+import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
@@ -23,6 +28,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.Scene;
 import javafx.beans.binding.Bindings;
+import javafx.scene.control.Slider;
 
 public class MainController {
     private final SignalRepository signalRepo;
@@ -42,6 +48,10 @@ public class MainController {
     public Button delete_button;
     @FXML
     public Button generate_button;
+    @FXML
+    public Button save_button;
+    @FXML
+    public Button load_button;
     @FXML
     public ComboBox<SignalType> signal_type;
     @FXML
@@ -68,6 +78,8 @@ public class MainController {
     public Spinner<Integer> jump_sample;
     @FXML
     public Spinner<Integer> sample_length;
+    @FXML
+    public Slider histogram_bins_slider;
 
     @FXML
     public ScatterChart<Number, Number> signal_chart;
@@ -126,6 +138,7 @@ public class MainController {
         general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
+        save_button.disableProperty().bind(signal_selector.valueProperty().isNull());
 
 //        Can't clone or delete something that isn't there
         clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
@@ -186,7 +199,7 @@ public class MainController {
                 if (sampling_rate != null) sampling_rate.getValueFactory().setValue(newVal.getSamplingFrequency());
 
                 if (newVal.isSampled()) {
-                    drawSignal(newVal);
+                    drawSignal(newVal, signal_chart, signal_bar_chart);
                 } else {
                     signal_chart.getData().clear();
                 }
@@ -196,6 +209,15 @@ public class MainController {
         });
 
         updateControlStates(signal_type.getValue());
+
+        if (histogram_bins_slider != null) {
+            histogram_bins_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                Signal currentSignal = signal_selector.getSelectionModel().getSelectedItem();
+                if (currentSignal != null && currentSignal.isSampled()) {
+                    drawSignal(currentSignal, signal_chart, signal_bar_chart);
+                }
+            });
+        }
     }
 
     private void updateControlStates(SignalType type) {
@@ -225,20 +247,74 @@ public class MainController {
         if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
     }
 
-    private void drawSignal(Signal signal) {
-        signal_chart.getData().clear();
+    private void drawSignal(Signal signal, ScatterChart scatterChart, BarChart barChart) {
         if (signal == null || !signal.isSampled()) {
+            scatterChart.getData().clear();
+            barChart.getData().clear();
             return;
         }
 
         DiscreteSignal ds = signal.getDiscreteSignal();
-        XYChart.Series<Number, Number> series = new XYChart.Series<>();
-
-        for (int i = 0; i < ds.getSampleCount(); i++) {
-            series.getData().add(new XYChart.Data<>(ds.getTimeAtIndex(i), ds.getSample(i)));
+        
+        XYChart.Series<Number, Number> scatterSeries;
+        if (scatterChart.getData().isEmpty()) {
+            scatterSeries = new XYChart.Series<>();
+            scatterChart.getData().add(scatterSeries);
+        } else {
+            scatterSeries = (XYChart.Series<Number, Number>) scatterChart.getData().get(0);
+            scatterSeries.getData().clear();
         }
 
-        signal_chart.getData().add(series);
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+
+        for (int i = 0; i < ds.getSampleCount(); i++) {
+            double val = ds.getSample(i);
+            scatterSeries.getData().add(new XYChart.Data<>(ds.getTimeAtIndex(i), val));
+            if (val < min) min = val;
+            if (val > max) max = val;
+        }
+
+        // Histogram logic
+        int bins = histogram_bins_slider != null ? (int) histogram_bins_slider.getValue() : 10;
+        if (bins <= 0) bins = 10;
+
+        int[] counts = new int[bins];
+        double binWidth = (max - min) / bins;
+        if (binWidth <= 0) binWidth = 1.0;
+
+        for (int i = 0; i < ds.getSampleCount(); i++) {
+            double val = ds.getSample(i);
+            int binIndex = (int) ((val - min) / binWidth);
+            if (binIndex >= bins) {
+                binIndex = bins - 1; // Put max value in the last bin
+            }
+            if (binIndex < 0) {
+                binIndex = 0;
+            }
+            counts[binIndex]++;
+        }
+
+        XYChart.Series barSeries;
+        if (barChart.getData().isEmpty()) {
+            barSeries = new XYChart.Series();
+            barChart.getData().add(barSeries);
+        } else {
+            barSeries = (XYChart.Series) barChart.getData().get(0);
+            barSeries.getData().clear();
+        }
+
+        for (int i = 0; i < bins; i++) {
+            double binStart = min + i * binWidth;
+            double binEnd = min + (i + 1) * binWidth;
+            String label = String.format("%.2f-%.2f", binStart, binEnd);
+            barSeries.getData().add(new XYChart.Data(label, counts[i]));
+        }
+    }
+
+    @FXML
+    private void handleCalculateOperation(){
+
     }
 
     @FXML
@@ -295,7 +371,7 @@ public class MainController {
         targetSignal.setSamplingFrequency(samplingRate);
         targetSignal.sample();
 
-        drawSignal(targetSignal);
+        drawSignal(targetSignal, signal_chart, signal_bar_chart);
     }
 
     @FXML
@@ -338,4 +414,63 @@ public class MainController {
         signal_selector.getSelectionModel().select(cloned);
     }
 
+        private final SignalFileHandler fileHandler = new SignalFileHandler();
+
+    @FXML
+    private void handleSaveSignal() {
+        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+        
+        if (selected == null || !selected.isSampled()) {
+            showError("Save Error", "Signal must be generated (sampled) before saving.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Signal (Binary)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Signal file (*.sig)", "*.sig"));
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            try {
+                fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
+            } catch (IOException e) {
+                showError("Save Error", "Could not save the file.\n" + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handleLoadSignal() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load Signal (Binary)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Signal file (*.sig)", "*.sig"));
+        File file = fileChooser.showOpenDialog(null);
+
+        if (file != null) {
+            try {
+                // Read binary file and construct discrete signal
+                DiscreteSignal ds = fileHandler.loadFromBinaryFile(file);
+                
+                // Wrap in local Signal entity and generate unique generic name
+                String newName = "Loaded " + file.getName().replace(".sig", "");
+                Signal loadedSignal = new Signal(newName, ds);
+                
+                // Save it into context repo and select in dropdown
+                signalRepo.addSignal(loadedSignal);
+                signal_selector.getSelectionModel().select(loadedSignal);
+
+
+            } catch (Exception e) {
+                showError("Load Error", "Failed to deserialize the file. Corrupted or missing data.\n" + e.getMessage());
+            }
+        }
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Encountered");
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
