@@ -80,6 +80,16 @@ public class MainController {
     public Spinner<Integer> sample_length;
     @FXML
     public Slider histogram_bins_slider;
+    @FXML
+    public Label stat_mean;
+    @FXML
+    public Label stat_abs_mean;
+    @FXML
+    public Label stat_avg_power;
+    @FXML
+    public Label stat_rms;
+    @FXML
+    public Label stat_variance;
 
     @FXML
     public ScatterChart<Number, Number> signal_chart;
@@ -251,10 +261,12 @@ public class MainController {
         if (signal == null || !signal.isSampled()) {
             scatterChart.getData().clear();
             barChart.getData().clear();
+            updateStatistics(null);
             return;
         }
 
         DiscreteSignal ds = signal.getDiscreteSignal();
+        updateStatistics(signal);
         
         XYChart.Series<Number, Number> scatterSeries;
         if (scatterChart.getData().isEmpty()) {
@@ -310,6 +322,27 @@ public class MainController {
             String label = String.format("%.2f-%.2f", binStart, binEnd);
             barSeries.getData().add(new XYChart.Data(label, counts[i]));
         }
+    }
+
+    private void updateStatistics(Signal signal) {
+        if (stat_mean == null || stat_abs_mean == null || stat_avg_power == null || stat_rms == null || stat_variance == null) {
+            return;
+        }
+        
+        if (signal == null || !signal.isSampled()) {
+            stat_mean.setText("-");
+            stat_abs_mean.setText("-");
+            stat_avg_power.setText("-");
+            stat_rms.setText("-");
+            stat_variance.setText("-");
+            return;
+        }
+
+        stat_mean.setText(String.format("%.4f", signal.mean()));
+        stat_abs_mean.setText(String.format("%.4f", signal.absoluteMean()));
+        stat_avg_power.setText(String.format("%.4f", signal.averagePower()));
+        stat_rms.setText(String.format("%.4f", signal.rms()));
+        stat_variance.setText(String.format("%.4f", signal.variance()));
     }
 
     @FXML

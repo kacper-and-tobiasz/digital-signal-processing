@@ -355,6 +355,50 @@
                                              </children></AnchorPane>
                                     </content>
                                   </TitledPane>
+                                  <TitledPane animated="false" text="Statystyki sygnału">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0">
+                                             <children>
+                                                <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <GridPane>
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="150.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="150.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label text="Wartość średnia:" />
+                                                            <Label fx:id="stat_mean" text="-" GridPane.columnIndex="1" />
+                                                            
+                                                            <Label text="Wartość średnia bezwzgl.:" GridPane.rowIndex="1" />
+                                                            <Label fx:id="stat_abs_mean" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            
+                                                            <Label text="Moc średnia:" GridPane.rowIndex="2" />
+                                                            <Label fx:id="stat_avg_power" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            
+                                                            <Label text="Wartość skuteczna (RMS):" GridPane.rowIndex="3" />
+                                                            <Label fx:id="stat_rms" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            
+                                                            <Label text="Wariancja:" GridPane.rowIndex="4" />
+                                                            <Label fx:id="stat_variance" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                         </children>
+                                                         <padding>
+                                                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                                         </padding>
+                                                      </GridPane>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </TitledPane>
                                 </panes>
                               </Accordion>
                            </children>
