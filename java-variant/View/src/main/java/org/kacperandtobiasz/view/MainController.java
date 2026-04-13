@@ -1,6 +1,8 @@
 package org.kacperandtobiasz.view;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -19,10 +21,10 @@ import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.model.base.signal.SignalFactory;
 import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
-import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.CategoryAxis;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -97,11 +99,34 @@ public class MainController {
     public BarChart signal_bar_chart;
 
     @FXML
+    public ComboBox<Signal> signal_selector1;
+    @FXML
+    public ComboBox<Signal> signal_selector2;
+    @FXML
+    public TextField result_signal_name;
+    @FXML
+    public ComboBox<String> operation_type;
+    @FXML
+    public ScatterChart<Number, Number> signal_chart1;
+    @FXML
+    public ScatterChart<Number, Number> signal_chart2;
+    @FXML
+    public ScatterChart<Number, Number> result_signal_chart;
+    @FXML
+    public BarChart result_signal_barchart;
+    @FXML
+    public TabPane main_tabpane;
+    @FXML
+    public Button calcuate_button;
+
+    @FXML
     public GridPane general_signal_settings;
     @FXML
     public VBox specific_signal_settings;
 
     private final ObservableList<Signal> signals = FXCollections.observableArrayList();
+    private final BooleanProperty selectedSignalSampled = new SimpleBooleanProperty(false);
+    private Signal lastOperationResult;
 
     public MainController(MainContext mainContext) {
         this.signalRepo = mainContext.signalRepository();
@@ -114,6 +139,26 @@ public class MainController {
     @FXML
     private void initialize() {
         signal_selector.setItems(signals);
+        if (signal_selector1 != null) signal_selector1.setItems(signals);
+        if (signal_selector2 != null) signal_selector2.setItems(signals);
+
+        if (operation_type != null) {
+            operation_type.getSelectionModel().select(0);
+        }
+
+        if (signal_selector1 != null) {
+            signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                drawSignal(newVal, signal_chart1, null);
+            });
+        }
+        if (signal_selector2 != null) {
+            signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                drawSignal(newVal, signal_chart2, null);
+            });
+        }
+        if (main_tabpane != null) {
+            main_tabpane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> redrawCharts());
+        }
 
         signal_type.getItems().addAll(SignalType.values());
         signal_type.getSelectionModel().select(SignalType.SIN);
@@ -148,7 +193,9 @@ public class MainController {
         general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-        save_button.disableProperty().bind(signal_selector.valueProperty().isNull());
+    save_button.disableProperty().bind(
+        signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
+    );
 
 //        Can't clone or delete something that isn't there
         clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
@@ -174,6 +221,24 @@ public class MainController {
                 }, signal_name.textProperty(), signals, signal_selector.valueProperty())
         );
 
+        if (calcuate_button != null) {
+            calcuate_button.disableProperty().bind(
+                    Bindings.createBooleanBinding(() -> {
+                        String text = result_signal_name != null ? result_signal_name.getText() : "";
+                        boolean noNames = text == null || text.trim().isEmpty();
+                        boolean noSignal1 = (signal_selector1 == null || signal_selector1.getValue() == null);
+                        boolean noSignal2 = (signal_selector2 == null || signal_selector2.getValue() == null);
+                        
+                        boolean notSampled = false;
+                        if (!noSignal1 && !noSignal2) {
+                            notSampled = !signal_selector1.getValue().isSampled() || !signal_selector2.getValue().isSampled();
+                        }
+                        
+                        return noNames || noSignal1 || noSignal2 || notSampled;
+                    }, result_signal_name.textProperty(), signal_selector1.valueProperty(), signal_selector2.valueProperty())
+            );
+        }
+
         Platform.runLater(() -> {
             Scene scene = signal_name.getScene();
             if (scene != null) {
@@ -188,6 +253,7 @@ public class MainController {
         signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 signal_name.setText(newVal.getName());
+                selectedSignalSampled.set(newVal.isSampled());
                 
                 if (newVal.getGenerator() != null) {
                     SignalParameters params = newVal.getGenerator().getParameters();
@@ -208,13 +274,10 @@ public class MainController {
                 }
                 if (sampling_rate != null) sampling_rate.getValueFactory().setValue(newVal.getSamplingFrequency());
 
-                if (newVal.isSampled()) {
-                    drawSignal(newVal, signal_chart, signal_bar_chart);
-                } else {
-                    signal_chart.getData().clear();
-                }
+                drawSignal(newVal, signal_chart, signal_bar_chart);
             } else {
-                signal_chart.getData().clear();
+                selectedSignalSampled.set(false);
+                drawSignal(null, signal_chart, signal_bar_chart);
             }
         });
 
@@ -226,8 +289,28 @@ public class MainController {
                 if (currentSignal != null && currentSignal.isSampled()) {
                     drawSignal(currentSignal, signal_chart, signal_bar_chart);
                 }
+                if (lastOperationResult != null && lastOperationResult.isSampled()) {
+                    drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
+                }
             });
         }
+    }
+
+    private void redrawCharts() {
+        Signal editorSignal = signal_selector != null ? signal_selector.getValue() : null;
+        drawSignal(editorSignal, signal_chart, signal_bar_chart);
+
+        redrawOperationPreviewCharts();
+
+        drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
+    }
+
+    private void redrawOperationPreviewCharts() {
+        Signal operationSignal1 = signal_selector1 != null ? signal_selector1.getValue() : null;
+        drawSignal(operationSignal1, signal_chart1, null);
+
+        Signal operationSignal2 = signal_selector2 != null ? signal_selector2.getValue() : null;
+        drawSignal(operationSignal2, signal_chart2, null);
     }
 
     private void updateControlStates(SignalType type) {
@@ -258,15 +341,25 @@ public class MainController {
     }
 
     private void drawSignal(Signal signal, ScatterChart scatterChart, BarChart barChart) {
+        if (scatterChart == null) return;
+        
         if (signal == null || !signal.isSampled()) {
             scatterChart.getData().clear();
-            barChart.getData().clear();
-            updateStatistics(null);
+            if (barChart != null) {
+                barChart.getData().clear();
+                if (barChart.getXAxis() instanceof CategoryAxis) {
+                    ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
+                }
+                updateStatistics(null);
+            }
             return;
         }
 
         DiscreteSignal ds = signal.getDiscreteSignal();
-        updateStatistics(signal);
+        
+        if (barChart != null) {
+            updateStatistics(signal);
+        }
         
         XYChart.Series<Number, Number> scatterSeries;
         if (scatterChart.getData().isEmpty()) {
@@ -287,40 +380,45 @@ public class MainController {
             if (val > max) max = val;
         }
 
-        // Histogram logic
-        int bins = histogram_bins_slider != null ? (int) histogram_bins_slider.getValue() : 10;
-        if (bins <= 0) bins = 10;
+        if (barChart != null) {
+            // Histogram logic
+            int bins = histogram_bins_slider != null ? (int) histogram_bins_slider.getValue() : 10;
+            if (bins <= 0) bins = 10;
 
-        int[] counts = new int[bins];
-        double binWidth = (max - min) / bins;
-        if (binWidth <= 0) binWidth = 1.0;
+            int[] counts = new int[bins];
+            double binWidth = (max - min) / bins;
+            if (binWidth <= 0) binWidth = 1.0;
 
-        for (int i = 0; i < ds.getSampleCount(); i++) {
-            double val = ds.getSample(i);
-            int binIndex = (int) ((val - min) / binWidth);
-            if (binIndex >= bins) {
-                binIndex = bins - 1; // Put max value in the last bin
+            for (int i = 0; i < ds.getSampleCount(); i++) {
+                double val = ds.getSample(i);
+                int binIndex = (int) ((val - min) / binWidth);
+                if (binIndex >= bins) {
+                    binIndex = bins - 1; // Put max value in the last bin
+                }
+                if (binIndex < 0) {
+                    binIndex = 0;
+                }
+                counts[binIndex]++;
             }
-            if (binIndex < 0) {
-                binIndex = 0;
+
+            XYChart.Series barSeries;
+            if (barChart.getData().isEmpty()) {
+                barSeries = new XYChart.Series();
+                barChart.getData().add(barSeries);
+            } else {
+                barSeries = (XYChart.Series) barChart.getData().get(0);
+                barSeries.getData().clear();
+                if (barChart.getXAxis() instanceof CategoryAxis) {
+                    ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
+                }
             }
-            counts[binIndex]++;
-        }
 
-        XYChart.Series barSeries;
-        if (barChart.getData().isEmpty()) {
-            barSeries = new XYChart.Series();
-            barChart.getData().add(barSeries);
-        } else {
-            barSeries = (XYChart.Series) barChart.getData().get(0);
-            barSeries.getData().clear();
-        }
-
-        for (int i = 0; i < bins; i++) {
-            double binStart = min + i * binWidth;
-            double binEnd = min + (i + 1) * binWidth;
-            String label = String.format("%.2f-%.2f", binStart, binEnd);
-            barSeries.getData().add(new XYChart.Data(label, counts[i]));
+            for (int i = 0; i < bins; i++) {
+                double binStart = min + i * binWidth;
+                double binEnd = min + (i + 1) * binWidth;
+                String label = String.format("%.2f-%.2f", binStart, binEnd);
+                barSeries.getData().add(new XYChart.Data(label, counts[i]));
+            }
         }
     }
 
@@ -346,8 +444,96 @@ public class MainController {
     }
 
     @FXML
-    private void handleCalculateOperation(){
+    private void handleCalculateOperation() {
+        Signal s1 = signal_selector1 != null ? signal_selector1.getValue() : null;
+        Signal s2 = signal_selector2 != null ? signal_selector2.getValue() : null;
+        String op = operation_type != null ? operation_type.getValue() : null;
+        String resName = result_signal_name != null ? result_signal_name.getText() : null;
 
+        if (s1 == null || s2 == null || op == null) {
+            showError("Błąd kalkulacji", "Upewnij się, że oba sygnały oraz rodzaj operacji zostały wybrane.");
+            return;
+        }
+        
+        if (resName == null || resName.trim().isEmpty()) {
+            showError("Brak nazwy", "Sygnał wynikowy musi posiadać odpowiednią nazwę.");
+            return;
+        }
+
+        try {
+            Signal result = null;
+            int skippedDivisionSamples = 0;
+            Signal previouslySelectedEditorSignal = signal_selector != null ? signal_selector.getValue() : null;
+            switch (op) {
+                case "Dodawanie":
+                    result = s1.add(resName, s2);
+                    break;
+                case "Odejmowanie":
+                    result = s1.subtract(resName, s2);
+                    break;
+                case "Mnożenie":
+                    result = s1.multiply(resName, s2);
+                    break;
+                case "Dzielenie":
+                    skippedDivisionSamples = s1.countDivisionSkippedSamples(s2);
+                    result = s1.divide(resName, s2);
+                    break;
+            }
+
+            if (result != null) {
+                Signal existingSignal = signals.stream()
+                        .filter(s -> s.getName().equals(resName))
+                        .findFirst()
+                        .orElse(null);
+
+                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
+                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
+                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
+
+                if (existingSignal != null) {
+                    int existingSignalIndex = signals.indexOf(existingSignal);
+                    if (existingSignalIndex >= 0) {
+                        signals.set(existingSignalIndex, result);
+                    } else {
+                        signalRepo.addSignal(result);
+                    }
+                } else {
+                    signalRepo.addSignal(result);
+                }
+
+                if (selMainMatch && signal_selector != null) {
+                    signal_selector.getSelectionModel().select(result);
+                } else if (signal_selector != null && previouslySelectedEditorSignal != null && signals.contains(previouslySelectedEditorSignal)) {
+                    signal_selector.getSelectionModel().select(previouslySelectedEditorSignal);
+                }
+
+                if (sel1Match && signal_selector1 != null) {
+                    signal_selector1.getSelectionModel().select(result);
+                }
+                if (sel2Match && signal_selector2 != null) {
+                    signal_selector2.getSelectionModel().select(result);
+                }
+
+                lastOperationResult = result;
+                
+                // Upewniamy się, że podglądy starych sygnałów zostaną przerysowane tak jak proszono
+                redrawCharts();
+
+                if ("Dzielenie".equals(op) && skippedDivisionSamples > 0) {
+                    showError(
+                            "Ostrzeżenie dzielenia",
+                            "Niektóre próbki zostały zastąpione zerem, ponieważ wartość mianownika była mniejsza niż epsilon. " +
+                                    "Liczba takich próbek: " + skippedDivisionSamples + "."
+                    );
+
+                    // Ensure charts are repainted after modal dialog is closed.
+                    drawSignal(result, result_signal_chart, result_signal_barchart);
+                }
+            
+            }
+        } catch (Exception e) {
+            showError("Błąd kalkulacji sygnałów", e.getMessage());
+        }
     }
 
     @FXML
@@ -403,8 +589,22 @@ public class MainController {
         targetSignal.setGenerator(newComputedState.getGenerator());
         targetSignal.setSamplingFrequency(samplingRate);
         targetSignal.sample();
+        selectedSignalSampled.set(targetSignal.isSampled());
 
-        drawSignal(targetSignal, signal_chart, signal_bar_chart);
+        // Refresh combobox to force cell update if needed (so name etc stay in sync visibly)
+        int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
+        if (selectedIndex >= 0) {
+            boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == targetSignal);
+            boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == targetSignal);
+
+            signals.set(selectedIndex, targetSignal);
+
+            signal_selector.getSelectionModel().select(selectedIndex);
+            if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(targetSignal);
+            if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(targetSignal);
+        }
+
+        redrawCharts();
     }
 
     @FXML
@@ -427,10 +627,18 @@ public class MainController {
                     .anyMatch(s -> s.getName().equals(currentText));
 
             if (!nameExists) {
+                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == selected);
+                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == selected);
+
                 selected.setName(currentText);
                 int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
                 signals.set(selectedIndex, selected);
+                
                 signal_selector.getSelectionModel().select(selectedIndex);
+                if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(selected);
+                if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(selected);
+
+                redrawCharts();
             } else {
                 signal_name.setText(selected.getName());
             }
@@ -454,20 +662,20 @@ public class MainController {
         Signal selected = signal_selector.getSelectionModel().getSelectedItem();
         
         if (selected == null || !selected.isSampled()) {
-            showError("Save Error", "Signal must be generated (sampled) before saving.");
+            showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
             return;
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Signal (Binary)");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Signal file (*.sig)", "*.sig"));
+        fileChooser.setTitle("Zapisz sygnał (binarnie)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Plik sygnału (*.sig)", "*.sig"));
         File file = fileChooser.showSaveDialog(null);
 
         if (file != null) {
             try {
                 fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
             } catch (IOException e) {
-                showError("Save Error", "Could not save the file.\n" + e.getMessage());
+                showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
             }
         }
     }
@@ -475,8 +683,8 @@ public class MainController {
     @FXML
     private void handleLoadSignal() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Load Signal (Binary)");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Signal file (*.sig)", "*.sig"));
+        fileChooser.setTitle("Wczytaj sygnał (binarnie)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Plik sygnału (*.sig)", "*.sig"));
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
@@ -485,23 +693,49 @@ public class MainController {
                 DiscreteSignal ds = fileHandler.loadFromBinaryFile(file);
                 
                 // Wrap in local Signal entity and generate unique generic name
-                String newName = "Loaded " + file.getName().replace(".sig", "");
+                String newName = "Wczytano " + file.getName().replace(".sig", "");
                 Signal loadedSignal = new Signal(newName, ds);
                 
-                // Save it into context repo and select in dropdown
-                signalRepo.addSignal(loadedSignal);
+                Signal existingSignal = signals.stream()
+                        .filter(s -> s.getName().equals(newName))
+                        .findFirst()
+                        .orElse(null);
+
+                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
+                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
+                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
+
+                if (existingSignal != null) {
+                    int existingSignalIndex = signals.indexOf(existingSignal);
+                    if (existingSignalIndex >= 0) {
+                        signals.set(existingSignalIndex, loadedSignal);
+                    } else {
+                        signalRepo.addSignal(loadedSignal);
+                    }
+                } else {
+                    signalRepo.addSignal(loadedSignal);
+                }
+
                 signal_selector.getSelectionModel().select(loadedSignal);
 
+                if (sel1Match && signal_selector1 != null) {
+                    signal_selector1.getSelectionModel().select(loadedSignal);
+                }
+                if (sel2Match && signal_selector2 != null) {
+                    signal_selector2.getSelectionModel().select(loadedSignal);
+                }
+
+                redrawCharts();
 
             } catch (Exception e) {
-                showError("Load Error", "Failed to deserialize the file. Corrupted or missing data.\n" + e.getMessage());
+                showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
             }
         }
     }
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error Encountered");
+        alert.setTitle("Napotkano błąd");
         alert.setHeaderText(title);
         alert.setContentText(message);
         alert.showAndWait();

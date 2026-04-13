@@ -1,0 +1,5 @@
+#previewSignalChart1 .chart-symbol,
+#previewSignalChart2 .chart-symbol {
+    -fx-background-radius: 1.5px;
+    -fx-padding: 1.5px;
+}

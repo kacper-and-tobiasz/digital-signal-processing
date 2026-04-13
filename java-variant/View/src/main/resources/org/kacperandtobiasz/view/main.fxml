@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -23,10 +24,11 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import java.lang.String?>
 
 <AnchorPane maxHeight="1.7976931348623157E308" minHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TabPane maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane fx:id="main_tabpane" maxHeight="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
           <Tab text="Edytor sygnałów">
                <content>
@@ -172,7 +174,7 @@
                                                                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                </GridPane.margin>
                                                             </ComboBox>
-                                                            <Spinner fx:id="amplitude" editable="true" initialValue="1.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                            <Spinner fx:id="amplitude" amountToStepBy="0.01" editable="true" initialValue="1.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                                                <GridPane.margin>
                                                                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                </GridPane.margin>
@@ -256,7 +258,7 @@
                                                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                      </GridPane.margin>
                                                                   </Label>
-                                                                  <Spinner fx:id="signal_start" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                                  <Spinner fx:id="signal_start" amountToStepBy="0.01" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                                                      <GridPane.margin>
                                                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                      </GridPane.margin>
@@ -515,6 +517,14 @@
                                                             </Button>
                                                             <Separator maxWidth="1.7976931348623157E308" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
                                                             <ComboBox fx:id="operation_type" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                                                               <items>
+                                                                  <FXCollections fx:factory="observableArrayList">
+                                                                     <String fx:value="Dodawanie" />
+                                                                     <String fx:value="Odejmowanie" />
+                                                                     <String fx:value="Mnożenie" />
+                                                                     <String fx:value="Dzielenie" />
+                                                                  </FXCollections>
+                                                               </items>
                                                                <GridPane.margin>
                                                                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                </GridPane.margin>
@@ -524,7 +534,7 @@
                                                                   <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                                                </GridPane.margin>
                                                             </Label>
-                                                            <ScatterChart fx:id="signal_chart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                                                            <ScatterChart fx:id="signal_chart1" id="previewSignalChart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                                                                <xAxis>
                                                                   <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
                                                                </xAxis>
@@ -532,7 +542,7 @@
                                                                   <NumberAxis label="Amplituda" side="LEFT" />
                                                                </yAxis>
                                                             </ScatterChart>
-                                                            <ScatterChart fx:id="signal_chart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                                                            <ScatterChart fx:id="signal_chart2" id="previewSignalChart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                                                                <xAxis>
                                                                   <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
                                                                </xAxis>
@@ -573,6 +583,14 @@
                                        </yAxis>
                                     </ScatterChart>
                                     <Separator prefWidth="200.0" />
+                                    <BarChart fx:id="result_signal_barchart" animated="false" legendVisible="false" title="Histogram amplitudy próbek">
+                                       <xAxis>
+                                          <CategoryAxis label="Amplituda sygnału" side="BOTTOM" />
+                                       </xAxis>
+                                       <yAxis>
+                                          <NumberAxis label="Liczba próbek" side="LEFT" />
+                                       </yAxis>
+                                    </BarChart>
                                  </children>
                               </VBox>
                            </children>

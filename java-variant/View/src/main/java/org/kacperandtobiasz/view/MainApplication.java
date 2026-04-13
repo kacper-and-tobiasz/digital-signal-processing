@@ -47,6 +47,11 @@ public class MainApplication extends Application {
         // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/Scene.html
         Scene scene = new Scene(sceneGraph);
 
+        URL mainCss = this.getClass().getResource("main.css");
+        if (mainCss != null) {
+            scene.getStylesheets().add(mainCss.toExternalForm());
+        }
+
         // Stage is simply an application window.
         stage.setTitle("Cyfrowe przetwarzanie sygnałów - Kacper Majkowski i Tobiasz Kowalczyk");
         stage.setScene(scene);
