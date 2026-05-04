@@ -1,11 +1,7 @@
-package org.kacperandtobiasz.view;
+package org.kacperandtobiasz.view.controllers;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -31,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.Scene;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Slider;
+import org.kacperandtobiasz.view.MainContext;
 
 public class MainController {
     private final SignalRepository signalRepo;

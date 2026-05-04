@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.kacperandtobiasz.view.controllers.MainController;
+import org.kacperandtobiasz.view.controllers.editor.EditorController;
+import org.kacperandtobiasz.view.controllers.operations.OperationsController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,9 +36,20 @@ public class MainApplication extends Application {
         // We're telling out loader where to load the '.fxml' from.
         loader.setLocation(mainFxml);
 
-        // FXMLLoader binds FXML objects to fields of a given controller using reflection at load time.
-        // That's why we have to specify the controller before loading the scene graph. (at least I think that's why).
-        loader.setController(new MainController(mainContext)); // this is where DI happens
+        loader.setControllerFactory(controllerClass -> {
+            try {
+                return controllerClass.getDeclaredConstructor(MainContext.class)
+                    .newInstance(mainContext);
+            } catch (NoSuchMethodException ignored) {
+                try {
+                    return controllerClass.getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not create controller: " + controllerClass.getName(), e);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Could not create controller: " + controllerClass.getName(), e);
+            }
+        });
 
         // Parent class is the base class for all nodes that have children in the scene graph.
         // It's responsible for a few things (consult JavaDoc for more detail), but

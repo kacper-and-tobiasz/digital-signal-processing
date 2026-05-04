@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<SplitPane disable="true" dividerPositions="0.4" prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.kacperandtobiasz.view.controllers.editor.EditorController"
+    >
+<items>
+    <AnchorPane maxWidth="400.0" minWidth="400.0" SplitPane.resizableWithParent="false">
+        <children>
+            <Accordion prefHeight="694.4" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <panes>
+                <TitledPane animated="false" text="Wybór sygnału">
+                    <content>
+                       <fx:include source="editor/signal_management.fxml" fx:id="signalManagement" />
+                    </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Ustawienia sygnału">
+                    <content>
+                        <fx:include source="editor/signal_settings.fxml" fx:id="signalSettings" />
+                    </content>
+                </TitledPane>
+                <TitledPane animated="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Ustawienia wykresów">
+                    <content>
+                        <fx:include source="editor/graph_settings.fxml" fx:id="graphSettings" />
+                    </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Statystyki sygnału">
+                    <content>
+                        <fx:include source="editor/signal_stats.fxml" fx:id="signalStats" />
+                    </content>
+                </TitledPane>
+            </panes>
+            </Accordion>
+        </children>
+    </AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0">
+        <children>
+            <fx:include source="common/signal_graphs.fxml" fx:id="signalGraphs" />
+        </children>
+    </AnchorPane>
+</items>
+</SplitPane>

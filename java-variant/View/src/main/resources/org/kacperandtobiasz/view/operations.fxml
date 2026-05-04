@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.ScatterChart?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import java.lang.String?>
+
+
+<SplitPane disable="true" dividerPositions="0.4" prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.kacperandtobiasz.view.controllers.operations.OperationsController"
+   >
+   <items>
+      <AnchorPane maxWidth="400.0" minWidth="400.0" SplitPane.resizableWithParent="false">
+         <children>
+            <Accordion prefHeight="694.4" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <panes>
+                  <TitledPane animated="false" text="Wybór sygnału i operacji">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                 <children>
+                                    <GridPane maxWidth="1.7976931348623157E308">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="187.0" minWidth="10.0" prefWidth="176.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="187.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <Label text="Sygnał 1:" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <ComboBox fx:id="signal_selector1" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </ComboBox>
+                                          <Label text="Nazwa sygnału wynikowego:" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <TextField fx:id="result_signal_name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <Label maxWidth="1.7976931348623157E308" text="Wybór sygnałów" textOverrun="WORD_ELLIPSIS" GridPane.columnSpan="2">
+                                             <font>
+                                                <Font name="System Bold" size="16.0" />
+                                             </font>
+                                             <GridPane.margin>
+                                                <Insets bottom="8.0" left="8.0" right="8.0" top="16.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Sygnał 2:" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <ComboBox fx:id="signal_selector2" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </ComboBox>
+                                          <Button fx:id="calcuate_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCalculateOperation" text="Generuj, spróbkuj i narysuj" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Button>
+                                          <Separator maxWidth="1.7976931348623157E308" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
+                                          <ComboBox fx:id="operation_type" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                                             <items>
+                                                <FXCollections fx:factory="observableArrayList">
+                                                   <String fx:value="Dodawanie" />
+                                                   <String fx:value="Odejmowanie" />
+                                                   <String fx:value="Mnożenie" />
+                                                   <String fx:value="Dzielenie" />
+                                                </FXCollections>
+                                             </items>
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </ComboBox>
+                                          <Label text="Rodzaj operacji:" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <ScatterChart fx:id="signal_chart1" id="previewSignalChart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                                             <xAxis>
+                                                <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                                             </xAxis>
+                                             <yAxis>
+                                                <NumberAxis label="Amplituda" side="LEFT" />
+                                             </yAxis>
+                                          </ScatterChart>
+                                          <ScatterChart fx:id="signal_chart2" id="previewSignalChart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                                             <xAxis>
+                                                <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                                             </xAxis>
+                                             <yAxis>
+                                                <NumberAxis label="Amplituda" side="LEFT" />
+                                             </yAxis>
+                                          </ScatterChart>
+                                       </children>
+                                       <padding>
+                                          <Insets left="15.0" right="15.0" />
+                                       </padding>
+                                    </GridPane>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </TitledPane>
+                  <TitledPane animated="false" text="Ustawienia wykresów">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <GridPane>
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label text="Ilość przedziałów histogramu:" />
+                                          <Slider fx:id="result_histogram_bins_slider" max="40.0" min="5.0" value="10.0" blockIncrement="1.0" majorTickUnit="5.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" GridPane.columnIndex="1" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                       </padding>
+                                    </GridPane>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </TitledPane>
+               </panes>
+            </Accordion>
+         </children>
+      </AnchorPane>
+      <AnchorPane minHeight="0.0" minWidth="0.0">
+         <children>
+            <VBox prefHeight="694.4" prefWidth="873.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <ScatterChart fx:id="result_signal_chart" animated="false" legendVisible="false" title="Wykres amplitudy sygnału od czasu">
+                     <xAxis>
+                        <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis label="Amplituda" side="LEFT" />
+                     </yAxis>
+                  </ScatterChart>
+                  <Separator prefWidth="200.0" />
+                  <BarChart fx:id="result_signal_barchart" animated="false" legendVisible="false" title="Histogram amplitudy próbek">
+                     <xAxis>
+                        <CategoryAxis label="Amplituda sygnału" side="BOTTOM" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis label="Liczba próbek" side="LEFT" />
+                     </yAxis>
+                  </BarChart>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </items>
+</SplitPane>
