@@ -137,36 +137,20 @@ public class MainController {
         this.signalRepo.setBackingList(signals);
     }
 
-    // Called after scene graph has been loaded and objects are accessible for post-processing.
-    @FXML
-    private void initialize() {
+    private void setupDropdownContents(){
         signal_selector.setItems(signals);
-        if (signal_selector1 != null) signal_selector1.setItems(signals);
-        if (signal_selector2 != null) signal_selector2.setItems(signals);
+        signal_selector1.setItems(signals);
+        signal_selector2.setItems(signals);
 
-        if (operation_type != null) {
-            operation_type.getSelectionModel().select(0);
-        }
+        operation_type.getSelectionModel().select(0);
+    }
 
-        if (signal_selector1 != null) {
-            signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-                drawSignal(newVal, signal_chart1, null);
-            });
-        }
-        if (signal_selector2 != null) {
-            signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-                drawSignal(newVal, signal_chart2, null);
-            });
-        }
-        if (main_tabpane != null) {
-            main_tabpane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> redrawCharts());
-        }
-
+    private void setupSignalTypeSelector(){
         signal_type.getItems().addAll(SignalType.values());
         signal_type.getSelectionModel().select(SignalType.SIN);
+    }
 
-        signal_type.valueProperty().addListener((obs, oldVal, newVal) -> updateControlStates(newVal));
-        
+    private void setupFrequencyPeriodBinding(){
         base_period.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal >= 0.01) {
                 double expectedFreq = 1.0 / newVal;
@@ -190,14 +174,39 @@ public class MainController {
                 signal_frequency.getValueFactory().setValue(0.01);
             }
         });
+    }
+
+    private void setupGraphSourceListeners(){
+        signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            drawSignal(newVal, signal_chart1, null);
+        });
+
+        signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            drawSignal(newVal, signal_chart2, null);
+        });
+    }
+
+    private void setupPaneSwitchGraphRedrawTrigger(){
+        if (main_tabpane != null) {
+            main_tabpane.getSelectionModel().selectedItemProperty().addListener(
+                    (obs, oldTab, newTab) -> redrawCharts()
+            );
+        }
+    }
+
+    private void setupControlsInteractions(){
+//        Only matching signal properties can be set for a given signal type.
+        signal_type.valueProperty().addListener(
+                (obs, oldVal, newVal) -> updateControlStates(newVal)
+        );
 
 //        If signal instance is not selected, user can't set parameters for it
         general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
         generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-    save_button.disableProperty().bind(
-        signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
-    );
+        save_button.disableProperty().bind(
+                signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
+        );
 
 //        Can't clone or delete something that isn't there
         clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
@@ -205,22 +214,22 @@ public class MainController {
 
 //        Before creation signal has to have a name
         create_button.disableProperty().bind(
-                Bindings.createBooleanBinding(() -> {
-                    String text = signal_name.getText();
-                    if (text == null || text.length() < 3) return true;
-                    return signals.stream().anyMatch(s -> s.getName().equals(text));
-                }, signal_name.textProperty(), signals)
+            Bindings.createBooleanBinding(() -> {
+                String text = signal_name.getText();
+                if (text == null || text.length() < 3) return true;
+                return signals.stream().anyMatch(s -> s.getName().equals(text));
+            }, signal_name.textProperty(), signals)
         );
-        
+
         rename_button.disableProperty().bind(
-                Bindings.createBooleanBinding(() -> {
-                    if (signal_selector.getValue() == null) return true;
-                    String text = signal_name.getText();
-                    if (text == null || text.length() < 3) return true;
-                    return signals.stream()
-                            .filter(s -> s != signal_selector.getValue())
-                            .anyMatch(s -> s.getName().equals(text));
-                }, signal_name.textProperty(), signals, signal_selector.valueProperty())
+            Bindings.createBooleanBinding(() -> {
+                if (signal_selector.getValue() == null) return true;
+                String text = signal_name.getText();
+                if (text == null || text.length() < 3) return true;
+                return signals.stream()
+                        .filter(s -> s != signal_selector.getValue())
+                        .anyMatch(s -> s.getName().equals(text));
+            }, signal_name.textProperty(), signals, signal_selector.valueProperty())
         );
 
         if (calcuate_button != null) {
@@ -230,16 +239,31 @@ public class MainController {
                         boolean noNames = text == null || text.trim().isEmpty();
                         boolean noSignal1 = (signal_selector1 == null || signal_selector1.getValue() == null);
                         boolean noSignal2 = (signal_selector2 == null || signal_selector2.getValue() == null);
-                        
+
                         boolean notSampled = false;
                         if (!noSignal1 && !noSignal2) {
                             notSampled = !signal_selector1.getValue().isSampled() || !signal_selector2.getValue().isSampled();
                         }
-                        
+
                         return noNames || noSignal1 || noSignal2 || notSampled;
                     }, result_signal_name.textProperty(), signal_selector1.valueProperty(), signal_selector2.valueProperty())
             );
         }
+    }
+
+
+
+    // Called after scene graph has been loaded and objects are accessible for post-processing.
+    @FXML
+    private void initialize() {
+        setupDropdownContents();
+        setupGraphSourceListeners();
+        setupFrequencyPeriodBinding();
+        setupSignalTypeSelector();
+        setupPaneSwitchGraphRedrawTrigger();
+        setupControlsInteractions();
+
+
 
         Platform.runLater(() -> {
             Scene scene = signal_name.getScene();

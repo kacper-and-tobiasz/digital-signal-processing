@@ -37,7 +37,7 @@ public class MainApplication extends Application {
         // That's why we have to specify the controller before loading the scene graph. (at least I think that's why).
         loader.setController(new MainController(mainContext)); // this is where DI happens
 
-        // Parent class is the base class for all nodes tehat have children in the scene graph.
+        // Parent class is the base class for all nodes that have children in the scene graph.
         // It's responsible for a few things (consult JavaDoc for more detail), but
         // we can think of it as root of the scene graph (the hierarchy).
         Parent sceneGraph = loader.load();
