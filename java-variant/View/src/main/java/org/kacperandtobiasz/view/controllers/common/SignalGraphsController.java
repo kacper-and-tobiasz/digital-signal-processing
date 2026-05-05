@@ -14,9 +14,11 @@ public class SignalGraphsController {
     @FXML
     public ScatterChart<Number, Number> signal_chart;
     @FXML
-    public BarChart signal_bar_chart;
+    public BarChart<Number, Number> signal_bar_chart;
 
     public SignalGraphsController(MainContext mainContext) {
+        mainContext.graphService().setBarChartInstance(signal_bar_chart);
+        mainContext.graphService().setScatterChartInstance(signal_chart);
     }
     
 }

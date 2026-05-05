@@ -44,4 +44,35 @@ public class SignalSettingsController {
 
     public SignalSettingsController(MainContext mainContext) {
     }
+
+    @FXML
+    private void initialize() {
+        setupFrequencyPeriodBinding();
+    }
+
+    private void setupFrequencyPeriodBinding(){
+        base_period.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal >= 0.01) {
+                double expectedFreq = 1.0 / newVal;
+                if (expectedFreq < 0.01) expectedFreq = 0.01;
+                if (signal_frequency.getValue() == null || Math.abs(signal_frequency.getValue() - expectedFreq) > 1e-6) {
+                    signal_frequency.getValueFactory().setValue(expectedFreq);
+                }
+            } else if (newVal != null && newVal < 0.01) {
+                base_period.getValueFactory().setValue(0.01);
+            }
+        });
+
+        signal_frequency.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal >= 0.01) {
+                double expectedPeriod = 1.0 / newVal;
+                if (expectedPeriod < 0.01) expectedPeriod = 0.01;
+                if (base_period.getValue() == null || Math.abs(base_period.getValue() - expectedPeriod) > 1e-6) {
+                    base_period.getValueFactory().setValue(expectedPeriod);
+                }
+            } else if (newVal != null && newVal < 0.01) {
+                signal_frequency.getValueFactory().setValue(0.01);
+            }
+        });
+    }
 }

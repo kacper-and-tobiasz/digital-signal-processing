@@ -59,42 +59,6 @@ public class MainController {
         signal_type.getSelectionModel().select(SignalType.SIN);
     }
 
-    private void setupFrequencyPeriodBinding(){
-        base_period.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal >= 0.01) {
-                double expectedFreq = 1.0 / newVal;
-                if (expectedFreq < 0.01) expectedFreq = 0.01;
-                if (signal_frequency.getValue() == null || Math.abs(signal_frequency.getValue() - expectedFreq) > 1e-6) {
-                    signal_frequency.getValueFactory().setValue(expectedFreq);
-                }
-            } else if (newVal != null && newVal < 0.01) {
-                base_period.getValueFactory().setValue(0.01);
-            }
-        });
-
-        signal_frequency.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal >= 0.01) {
-                double expectedPeriod = 1.0 / newVal;
-                if (expectedPeriod < 0.01) expectedPeriod = 0.01;
-                if (base_period.getValue() == null || Math.abs(base_period.getValue() - expectedPeriod) > 1e-6) {
-                    base_period.getValueFactory().setValue(expectedPeriod);
-                }
-            } else if (newVal != null && newVal < 0.01) {
-                signal_frequency.getValueFactory().setValue(0.01);
-            }
-        });
-    }
-
-    private void setupGraphSourceListeners(){
-        signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            drawSignal(newVal, signal_chart1, null);
-        });
-
-        signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            drawSignal(newVal, signal_chart2, null);
-        });
-    }
-
     private void setupPaneSwitchGraphRedrawTrigger(){
         if (main_tabpane != null) {
             main_tabpane.getSelectionModel().selectedItemProperty().addListener(
@@ -160,7 +124,18 @@ public class MainController {
         }
     }
 
-
+    private void setupEscapeKeyFocusReset(){
+        Platform.runLater(() -> {
+            Scene scene = main_tabpane.getScene();
+            if (scene != null) {
+                scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        scene.getRoot().requestFocus();
+                    }
+                });
+            }
+        });
+    }
 
     // Called after scene graph has been loaded and objects are accessible for post-processing.
     @FXML
@@ -171,38 +146,32 @@ public class MainController {
         setupSignalTypeSelector();
         setupPaneSwitchGraphRedrawTrigger();
         setupControlsInteractions();
+        setupEscapeKeyFocusReset();
+        setupHistogramBinSliders();
+        setupParameterUpdateOnSignalChange();
 
+        updateControlStates(signal_type.getValue());
+    }
 
-
-        Platform.runLater(() -> {
-            Scene scene = signal_name.getScene();
-            if (scene != null) {
-                scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    if (event.getCode() == KeyCode.ESCAPE) {
-                        scene.getRoot().requestFocus();
-                    }
-                });
-            }
-        });
-
+    private void setupParameterUpdateOnSignalChange() {
         signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 signal_name.setText(newVal.getName());
                 selectedSignalSampled.set(newVal.isSampled());
-                
+
                 if (newVal.getGenerator() != null) {
                     SignalParameters params = newVal.getGenerator().getParameters();
                     signal_type.getSelectionModel().select(newVal.getGenerator().getSignalType());
-                    
+
                     amplitude.getValueFactory().setValue(params.getAmplitude());
                     if (signal_start != null) signal_start.getValueFactory().setValue(params.getStartTime());
                     if (signal_duration != null) signal_duration.getValueFactory().setValue(params.getDuration());
-                    
+
                     if (base_period != null) base_period.getValueFactory().setValue(params.getPeriod());
                     if (duty_cycle != null) duty_cycle.getValueFactory().setValue(params.getDutyCycle());
                     if (jump_time != null) jump_time.getValueFactory().setValue(params.getJumpTime());
                     if (probability != null) probability.getValueFactory().setValue(params.getProbability());
-                    
+
                     if (first_sample != null) first_sample.getValueFactory().setValue(params.getFirstSample());
                     if (jump_sample != null) jump_sample.getValueFactory().setValue(params.getJumpSample());
                     if (sample_length != null) sample_length.getValueFactory().setValue(params.getSampleLength());
@@ -215,25 +184,6 @@ public class MainController {
                 drawSignal(null, signal_chart, signal_bar_chart);
             }
         });
-
-        updateControlStates(signal_type.getValue());
-
-        if (histogram_bins_slider != null) {
-            histogram_bins_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-                Signal currentSignal = signal_selector.getSelectionModel().getSelectedItem();
-                if (currentSignal != null && currentSignal.isSampled()) {
-                    drawSignal(currentSignal, signal_chart, signal_bar_chart);
-                }
-            });
-        }
-        
-        if (result_histogram_bins_slider != null) {
-            result_histogram_bins_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-                if (lastOperationResult != null && lastOperationResult.isSampled()) {
-                    drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
-                }
-            });
-        }
     }
 
     private void redrawCharts() {
@@ -368,26 +318,7 @@ public class MainController {
         }
     }
 
-    private void updateStatistics(Signal signal) {
-        if (stat_mean == null || stat_abs_mean == null || stat_avg_power == null || stat_rms == null || stat_variance == null) {
-            return;
-        }
-        
-        if (signal == null || !signal.isSampled()) {
-            stat_mean.setText("-");
-            stat_abs_mean.setText("-");
-            stat_avg_power.setText("-");
-            stat_rms.setText("-");
-            stat_variance.setText("-");
-            return;
-        }
 
-        stat_mean.setText(String.format("%.4f", signal.mean()));
-        stat_abs_mean.setText(String.format("%.4f", signal.absoluteMean()));
-        stat_avg_power.setText(String.format("%.4f", signal.averagePower()));
-        stat_rms.setText(String.format("%.4f", signal.rms()));
-        stat_variance.setText(String.format("%.4f", signal.variance()));
-    }
 
     @FXML
     private void handleCalculateOperation() {
@@ -482,202 +413,7 @@ public class MainController {
         }
     }
 
-    @FXML
-    private void handleCreateSignal() {
-        String newName = signal_name.getText();
 
-        SignalType type = signal_type.getValue();
-        if (type == null) {
-            throw new IllegalArgumentException("Signal type must be selected");
-        }
-
-        Signal signal = new Signal(newName, null, 100.0);
-
-        signalRepo.addSignal(signal);
-        signal_selector.getSelectionModel().select(signal);
-    }
-
-    @FXML
-    private void handleGenerateSignal() {
-        Signal targetSignal = signal_selector.getSelectionModel().getSelectedItem();
-        if (targetSignal == null) return;
-
-        SignalType type = signal_type.getValue();
-        if (type == null) {
-            throw new IllegalArgumentException("Signal type must be selected");
-        }
-
-        String name = targetSignal.getName();
-        double amp = amplitude.getValue() != null ? amplitude.getValue() : 1.0;
-        double start = (signal_start != null && signal_start.getValue() != null) ? signal_start.getValue() : 0.0;
-        double dur = (signal_duration != null && signal_duration.getValue() != null) ? signal_duration.getValue() : 1.0;
-        double period = base_period.getValue() != null ? base_period.getValue() : 1.0;
-        double duty = duty_cycle.getValue() != null ? duty_cycle.getValue() : 0.5;
-        double samplingRate = sampling_rate.getValue() != null ? sampling_rate.getValue() : 100.0;
-
-        double jump = jump_time.getValue() != null ? jump_time.getValue() : 0.0;
-        double prob = probability.getValue() != null ? probability.getValue() : 0.5;
-
-        int firstSamp = (first_sample != null && first_sample.getValue() != null) ? first_sample.getValue() : 0;
-        int jumpSamp = (jump_sample != null && jump_sample.getValue() != null) ? jump_sample.getValue() : 0;
-        int sampLen = (sample_length != null && sample_length.getValue() != null) ? sample_length.getValue() : 100;
-
-        SignalParameters params = new SignalParameters(amp, start, dur)
-                .withPeriod(period)
-                .withDutyCycle(duty)
-                .withJumpTime(jump)
-                .withProbability(prob)
-                .withFirstSample(firstSamp)
-                .withJumpSample(jumpSamp)
-                .withSampleLength(sampLen);
-
-        Signal newComputedState = SignalFactory.create(type, name, samplingRate, params);
-        targetSignal.setGenerator(newComputedState.getGenerator());
-        targetSignal.setSamplingFrequency(samplingRate);
-        targetSignal.sample();
-        selectedSignalSampled.set(targetSignal.isSampled());
-
-        // Refresh combobox to force cell update if needed (so name etc stay in sync visibly)
-        int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-        if (selectedIndex >= 0) {
-            boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == targetSignal);
-            boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == targetSignal);
-
-            signals.set(selectedIndex, targetSignal);
-
-            signal_selector.getSelectionModel().select(selectedIndex);
-            if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(targetSignal);
-            if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(targetSignal);
-        }
-
-        redrawCharts();
-    }
-
-    @FXML
-    private void handleDeleteSignal() {
-        Signal signal = signal_selector.getSelectionModel().getSelectedItem();
-        if (signal == null) {
-            throw new IllegalArgumentException("Signal is null, so it cannot be deleted");
-        }
-
-        signalRepo.removeSignal(signal);
-    }
-    
-    @FXML
-    private void handleRenameSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
-        String currentText = signal_name.getText();
-        if (selected != null && currentText != null && currentText.length() >= 3) {
-            boolean nameExists = signals.stream()
-                    .filter(s -> s != selected)
-                    .anyMatch(s -> s.getName().equals(currentText));
-
-            if (!nameExists) {
-                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == selected);
-                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == selected);
-
-                selected.setName(currentText);
-                int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-                signals.set(selectedIndex, selected);
-                
-                signal_selector.getSelectionModel().select(selectedIndex);
-                if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(selected);
-                if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(selected);
-
-                redrawCharts();
-            } else {
-                signal_name.setText(selected.getName());
-            }
-        }
-    }
-
-    @FXML
-    private void handleCloneSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-
-        Signal cloned = selected.deepCopy();
-        signalRepo.addSignal(cloned);
-        signal_selector.getSelectionModel().select(cloned);
-    }
-
-        private final SignalFileHandler fileHandler = new SignalFileHandler();
-
-    @FXML
-    private void handleSaveSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
-        
-        if (selected == null || !selected.isSampled()) {
-            showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
-            return;
-        }
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Zapisz sygnał (binarnie)");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Plik sygnału (*.sig)", "*.sig"));
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            try {
-                fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
-            } catch (IOException e) {
-                showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
-            }
-        }
-    }
-
-    @FXML
-    private void handleLoadSignal() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Wczytaj sygnał (binarnie)");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Plik sygnału (*.sig)", "*.sig"));
-        File file = fileChooser.showOpenDialog(null);
-
-        if (file != null) {
-            try {
-                // Read binary file and construct discrete signal
-                DiscreteSignal ds = fileHandler.loadFromBinaryFile(file);
-                
-                // Wrap in local Signal entity and generate unique generic name
-                String newName = "Wczytano " + file.getName().replace(".sig", "");
-                Signal loadedSignal = new Signal(newName, ds);
-                
-                Signal existingSignal = signals.stream()
-                        .filter(s -> s.getName().equals(newName))
-                        .findFirst()
-                        .orElse(null);
-
-                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
-                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
-                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
-
-                if (existingSignal != null) {
-                    int existingSignalIndex = signals.indexOf(existingSignal);
-                    if (existingSignalIndex >= 0) {
-                        signals.set(existingSignalIndex, loadedSignal);
-                    } else {
-                        signalRepo.addSignal(loadedSignal);
-                    }
-                } else {
-                    signalRepo.addSignal(loadedSignal);
-                }
-
-                signal_selector.getSelectionModel().select(loadedSignal);
-
-                if (sel1Match && signal_selector1 != null) {
-                    signal_selector1.getSelectionModel().select(loadedSignal);
-                }
-                if (sel2Match && signal_selector2 != null) {
-                    signal_selector2.getSelectionModel().select(loadedSignal);
-                }
-
-                redrawCharts();
-
-            } catch (Exception e) {
-                showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
-            }
-        }
-    }
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

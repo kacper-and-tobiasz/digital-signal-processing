@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.chart.ScatterChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.kacperandtobiasz.view.controllers.operations.OperationSelectorController"
+            minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+    <children>
+        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <children>
+                <GridPane maxWidth="1.7976931348623157E308">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="187.0" minWidth="10.0" prefWidth="176.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="187.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="Sygnał 1:" GridPane.rowIndex="1">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <ComboBox fx:id="signal_selector1" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </ComboBox>
+                        <Label text="Nazwa sygnału wynikowego:" GridPane.rowIndex="5">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <TextField fx:id="result_signal_name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </TextField>
+                        <Label maxWidth="1.7976931348623157E308" text="Wybór sygnałów" textOverrun="WORD_ELLIPSIS" GridPane.columnSpan="2">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                            <GridPane.margin>
+                                <Insets bottom="8.0" left="8.0" right="8.0" top="16.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <Label text="Sygnał 2:" GridPane.rowIndex="3">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <ComboBox fx:id="signal_selector2" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </ComboBox>
+                        <Button fx:id="calcuate_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCalculateOperation" text="Generuj, spróbkuj i narysuj" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </Button>
+                        <Separator maxWidth="1.7976931348623157E308" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
+                        <ComboBox fx:id="operation_type" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="12">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Dodawanie" />
+                                    <String fx:value="Odejmowanie" />
+                                    <String fx:value="Mnożenie" />
+                                    <String fx:value="Dzielenie" />
+                                </FXCollections>
+                            </items>
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </ComboBox>
+                        <Label text="Rodzaj operacji:" GridPane.rowIndex="12">
+                            <GridPane.margin>
+                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                            </GridPane.margin>
+                        </Label>
+                        <ScatterChart fx:id="signal_chart1" id="previewSignalChart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                            <xAxis>
+                                <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Amplituda" side="LEFT" />
+                            </yAxis>
+                        </ScatterChart>
+                        <ScatterChart fx:id="signal_chart2" id="previewSignalChart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                            <xAxis>
+                                <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Amplituda" side="LEFT" />
+                            </yAxis>
+                        </ScatterChart>
+                    </children>
+                    <padding>
+                        <Insets left="15.0" right="15.0" />
+                    </padding>
+                </GridPane>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

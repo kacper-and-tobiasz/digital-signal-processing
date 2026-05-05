@@ -3,6 +3,7 @@ module org.kacperandtobiasz.view {
     requires javafx.fxml;
     requires org.kacperandtobiasz.model;
     requires javafx.graphics;
+    requires java.logging;
 
 
     opens org.kacperandtobiasz.view to javafx.fxml;

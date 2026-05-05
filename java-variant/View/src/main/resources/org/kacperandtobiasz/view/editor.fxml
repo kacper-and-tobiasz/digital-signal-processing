@@ -28,7 +28,7 @@
                 </TitledPane>
                 <TitledPane animated="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Ustawienia wykresów">
                     <content>
-                        <fx:include source="editor/graph_settings.fxml" fx:id="graphSettings" />
+                        <fx:include source="common/graph_settings.fxml" fx:id="graphSettings" />
                     </content>
                 </TitledPane>
                 <TitledPane animated="false" text="Statystyki sygnału">
