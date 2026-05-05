@@ -64,62 +64,7 @@ public class MainController {
 //        }
 //    }
 
-//    private void setupControlsInteractions(){
-////        Only matching signal properties can be set for a given signal type.
-//        signal_type.valueProperty().addListener(
-//                (obs, oldVal, newVal) -> updateControlStates(newVal)
-//        );
-//
-////        If signal instance is not selected, user can't set parameters for it
-//        general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
-//        specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
-//        generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-//        save_button.disableProperty().bind(
-//                signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
-//        );
-//
-////        Can't clone or delete something that isn't there
-//        clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-//        delete_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-//
-////        Before creation signal has to have a name
-//        create_button.disableProperty().bind(
-//            Bindings.createBooleanBinding(() -> {
-//                String text = signal_name.getText();
-//                if (text == null || text.length() < 3) return true;
-//                return signals.stream().anyMatch(s -> s.getName().equals(text));
-//            }, signal_name.textProperty(), signals)
-//        );
-//
-//        rename_button.disableProperty().bind(
-//            Bindings.createBooleanBinding(() -> {
-//                if (signal_selector.getValue() == null) return true;
-//                String text = signal_name.getText();
-//                if (text == null || text.length() < 3) return true;
-//                return signals.stream()
-//                        .filter(s -> s != signal_selector.getValue())
-//                        .anyMatch(s -> s.getName().equals(text));
-//            }, signal_name.textProperty(), signals, signal_selector.valueProperty())
-//        );
-//
-//        if (calcuate_button != null) {
-//            calcuate_button.disableProperty().bind(
-//                    Bindings.createBooleanBinding(() -> {
-//                        String text = result_signal_name != null ? result_signal_name.getText() : "";
-//                        boolean noNames = text == null || text.trim().isEmpty();
-//                        boolean noSignal1 = (signal_selector1 == null || signal_selector1.getValue() == null);
-//                        boolean noSignal2 = (signal_selector2 == null || signal_selector2.getValue() == null);
-//
-//                        boolean notSampled = false;
-//                        if (!noSignal1 && !noSignal2) {
-//                            notSampled = !signal_selector1.getValue().isSampled() || !signal_selector2.getValue().isSampled();
-//                        }
-//
-//                        return noNames || noSignal1 || noSignal2 || notSampled;
-//                    }, result_signal_name.textProperty(), signal_selector1.valueProperty(), signal_selector2.valueProperty())
-//            );
-//        }
-//    }
+
 
     private void setupEscapeKeyFocusReset(){
         Platform.runLater(() -> {
@@ -200,32 +145,7 @@ public class MainController {
 //        drawSignal(operationSignal2, signal_chart2, null);
 //    }
 //
-//    private void updateControlStates(SignalType type) {
-//        if (type == null) return;
-//
-//        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT ||
-//                type == SignalType.SIN_FULL_RECT || type == SignalType.RECT ||
-//                type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
-//
-//        boolean usesDutyCycle = type == SignalType.RECT || type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
-//        boolean usesJumpTime = type == SignalType.UNIT_JUMP;
-//        boolean usesProbability = type == SignalType.IMPULSE_NOISE;
-//        boolean usesDiscreteParams = type == SignalType.UNIT_IMPULSE || type == SignalType.IMPULSE_NOISE;
-//        boolean usesContinuousParams = !usesDiscreteParams;
-//
-//        base_period.setDisable(!usesPeriod);
-//        signal_frequency.setDisable(!usesPeriod);
-//        duty_cycle.setDisable(!usesDutyCycle);
-//        if (jump_time != null) jump_time.setDisable(!usesJumpTime);
-//        if (probability != null) probability.setDisable(!usesProbability);
-//
-//        if (signal_start != null) signal_start.setDisable(!usesContinuousParams);
-//        if (signal_duration != null) signal_duration.setDisable(!usesContinuousParams);
-//
-//        if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
-//        if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
-//        if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
-//    }
+
 //
 //    @FXML
 //    private void handleCalculateOperation() {

@@ -47,7 +47,7 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <ComboBox fx:id="signal_selector1" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                        <ComboBox fx:id="firstSignalSelectorComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
@@ -75,12 +75,12 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <ComboBox fx:id="signal_selector2" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <ComboBox fx:id="secondSignalSelectorCombobox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </ComboBox>
-                        <Button fx:id="calcuate_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCalculateOperation" text="Generuj, spróbkuj i narysuj" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
+                        <Button fx:id="calculateButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCalculateOperation" text="Generuj, spróbkuj i narysuj" GridPane.columnSpan="2147483647" GridPane.rowIndex="14">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
@@ -104,7 +104,7 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <ScatterChart fx:id="signal_chart1" id="previewSignalChart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                        <ScatterChart fx:id="firstSignalPreviewChart" id="previewSignalChart1" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                             <xAxis>
                                 <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
                             </xAxis>
@@ -112,7 +112,7 @@
                                 <NumberAxis label="Amplituda" side="LEFT" />
                             </yAxis>
                         </ScatterChart>
-                        <ScatterChart fx:id="signal_chart2" id="previewSignalChart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                        <ScatterChart fx:id="secondSignalPreviewChart" id="previewSignalChart2" animated="false" legendVisible="false" prefHeight="160.0" title="Wykres amplitudy sygnału od czasu" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                             <xAxis>
                                 <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
                             </xAxis>

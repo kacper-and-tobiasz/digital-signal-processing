@@ -57,6 +57,35 @@ public class SignalSettingsController {
         setupFrequencyPeriodBinding();
     }
 
+
+
+    //    private void updateControlStates(SignalType type) {
+//        if (type == null) return;
+//
+//        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT ||
+//                type == SignalType.SIN_FULL_RECT || type == SignalType.RECT ||
+//                type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
+//
+//        boolean usesDutyCycle = type == SignalType.RECT || type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
+//        boolean usesJumpTime = type == SignalType.UNIT_JUMP;
+//        boolean usesProbability = type == SignalType.IMPULSE_NOISE;
+//        boolean usesDiscreteParams = type == SignalType.UNIT_IMPULSE || type == SignalType.IMPULSE_NOISE;
+//        boolean usesContinuousParams = !usesDiscreteParams;
+//
+//        base_period.setDisable(!usesPeriod);
+//        signal_frequency.setDisable(!usesPeriod);
+//        duty_cycle.setDisable(!usesDutyCycle);
+//        if (jump_time != null) jump_time.setDisable(!usesJumpTime);
+//        if (probability != null) probability.setDisable(!usesProbability);
+//
+//        if (signal_start != null) signal_start.setDisable(!usesContinuousParams);
+//        if (signal_duration != null) signal_duration.setDisable(!usesContinuousParams);
+//
+//        if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
+//        if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
+//        if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
+//    }
+
     private void bindToContext() {
         if (signal_type != null) {
             signal_type.valueProperty().bindBidirectional(signalParameters.signalType());

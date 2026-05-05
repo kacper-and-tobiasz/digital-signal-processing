@@ -1,11 +1,10 @@
 package org.kacperandtobiasz.view.controllers.operations;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.view.MainContext;
@@ -17,20 +16,20 @@ public class OperationSelectorController {
     private final GraphService graphService;
 
     @FXML
-    public ComboBox<Signal> signal_selector1;
+    public ComboBox<Signal> firstSignalSelectorComboBox;
     @FXML
-    public ComboBox<Signal> signal_selector2;
+    public ComboBox<Signal> secondSignalSelectorCombobox;
     @FXML
     public TextField result_signal_name;
     @FXML
     public ComboBox<String> operation_type;
     @FXML
-    public ScatterChart<Number, Number> signal_chart1;
+    public ScatterChart<Number, Number> firstSignalPreviewChart;
     @FXML
-    public ScatterChart<Number, Number> signal_chart2;
+    public ScatterChart<Number, Number> secondSignalPreviewChart;
 
     @FXML
-    public Button calcuate_button;
+    public Button calculateButton;
 
     public OperationSelectorController(MainContext mainContext) {
         this.mainContext = mainContext;
@@ -43,13 +42,33 @@ public class OperationSelectorController {
     }
 
     private void setupGraphSourceListeners(){
-        signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            graphService.drawScatterChart(newVal.getDiscreteSignal(), signal_chart1);
+        firstSignalSelectorComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            graphService.drawScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
         });
 
-        signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            graphService.drawScatterChart(newVal.getDiscreteSignal(), signal_chart2);
+        secondSignalSelectorCombobox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            graphService.drawScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
         });
+    }
+
+    private void setupControlsInteractions(){
+        if (calculateButton != null) {
+            calculateButton.disableProperty().bind(
+                    Bindings.createBooleanBinding(() -> {
+                        String text = result_signal_name != null ? result_signal_name.getText() : "";
+                        boolean noNames = text == null || text.trim().isEmpty();
+                        boolean noSignal1 = (firstSignalSelectorComboBox == null || firstSignalSelectorComboBox.getValue() == null);
+                        boolean noSignal2 = (secondSignalSelectorCombobox == null || secondSignalSelectorCombobox.getValue() == null);
+
+                        boolean notSampled = false;
+                        if (!noSignal1 && !noSignal2) {
+                            notSampled = !firstSignalSelectorComboBox.getValue().isSampled() || !secondSignalSelectorCombobox.getValue().isSampled();
+                        }
+
+                        return noNames || noSignal1 || noSignal2 || notSampled;
+                    }, result_signal_name.textProperty(), firstSignalSelectorComboBox.valueProperty(), secondSignalSelectorCombobox.valueProperty())
+            );
+        }
     }
 
     @FXML

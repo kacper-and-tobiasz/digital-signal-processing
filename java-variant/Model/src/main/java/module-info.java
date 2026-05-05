@@ -4,4 +4,5 @@ module org.kacperandtobiasz.model {
     exports org.kacperandtobiasz.model.base.signal;
     exports org.kacperandtobiasz.model.base.signal.generator;
     exports org.kacperandtobiasz.model.storage;
+    exports org.kacperandtobiasz.model.util;
 }

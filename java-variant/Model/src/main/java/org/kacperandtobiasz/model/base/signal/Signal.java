@@ -242,7 +242,7 @@ public class Signal {
     }
 
     public Signal deepCopy() {
-        Signal cloned = new Signal("Copy " + this.name, this.generator != null ? this.generator.clone() : null, this.samplingFrequency);
+        Signal cloned = new Signal(this.name, this.generator != null ? this.generator.clone() : null, this.samplingFrequency);
         if (this.isSampled()) {
             cloned.discreteSignal = new DiscreteSignal(
                     this.discreteSignal.samples(), 

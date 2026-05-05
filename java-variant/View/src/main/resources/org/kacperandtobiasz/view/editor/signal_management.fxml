@@ -57,33 +57,33 @@
                         <Insets bottom="8.0" left="8.0" right="8.0" top="16.0" />
                     </GridPane.margin>
                 </Label>
-                <Button fx:id="create_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreateSignal" text="Utwórz" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                <Button fx:id="createButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreateSignal" text="Utwórz" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="delete_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDeleteSignal" text="Usuń" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                <Button fx:id="deleteButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleDeleteSignal" text="Usuń" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="5">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="rename_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRenameSignal" prefHeight="25.0" text="Zmień nazwę" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                <Button fx:id="renameButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRenameSignal" prefHeight="25.0" text="Zmień nazwę" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="clone_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCloneSignal" text="Sklonuj" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                <Button fx:id="cloneButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCloneSignal" text="Sklonuj" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>
                 </Button>
                 <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="8" />
-                <Button fx:id="save_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSaveSignal" text="Zapisz do pliku" GridPane.rowIndex="9">
+                <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSaveSignal" text="Zapisz do pliku" GridPane.rowIndex="9">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>
                 </Button>
-                <Button fx:id="load_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoadSignal" text="Wczytaj z pliku" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                <Button fx:id="loadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoadSignal" text="Wczytaj z pliku" GridPane.columnIndex="1" GridPane.rowIndex="9">
                     <GridPane.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </GridPane.margin>

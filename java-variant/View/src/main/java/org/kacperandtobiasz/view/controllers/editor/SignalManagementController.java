@@ -1,5 +1,6 @@
 package org.kacperandtobiasz.view.controllers.editor;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -7,6 +8,7 @@ import javafx.stage.FileChooser;
 import org.kacperandtobiasz.model.base.SignalRepository;
 import org.kacperandtobiasz.model.base.signal.*;
 import org.kacperandtobiasz.model.storage.SignalFileHandler;
+import org.kacperandtobiasz.model.util.SignalUtil;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.SignalParameterState;
 
@@ -18,19 +20,20 @@ public class SignalManagementController {
     public ComboBox<Signal> signalSelectorComboBox;
     @FXML
     public TextField signalNameField;
-    @FXML
-    public Button rename_button;
-    @FXML
-    public Button clone_button;
-    @FXML
-    public Button create_button;
-    @FXML
-    public Button delete_button;
 
     @FXML
-    public Button save_button;
+    public Button renameButton;
     @FXML
-    public Button load_button;
+    public Button cloneButton;
+    @FXML
+    public Button createButton;
+    @FXML
+    public Button deleteButton;
+
+    @FXML
+    public Button saveButton;
+    @FXML
+    public Button loadButton;
 
 
     private final SignalRepository signalRepo;
@@ -48,6 +51,37 @@ public class SignalManagementController {
             this.signals = signals;
             signalSelectorComboBox.setItems(signals);
         }
+        setupControlsInteractions();
+    }
+
+    private void setupControlsInteractions(){
+        // TODO: Can signal be saved when not sampled?
+        saveButton.disableProperty().bind(
+                signalSelectorComboBox.valueProperty().isNull()
+        );
+
+//        Can't clone or delete something that isn't there
+        cloneButton.disableProperty().bind(signalSelectorComboBox.valueProperty().isNull());
+        deleteButton.disableProperty().bind(signalSelectorComboBox.valueProperty().isNull());
+
+//        New signal name has to be available
+        createButton.disableProperty().bind(
+            Bindings.createBooleanBinding(
+                () -> !signalRepo.isSignalNameAvailable(signalNameField.getText()),
+                signalNameField.textProperty(), signals
+            )
+        );
+//        New signal name has to be available and an existing signal has to be selected for renaming.
+        renameButton.disableProperty().bind(
+            Bindings.createBooleanBinding(
+                () -> !isAnySignalSelected() || !signalRepo.isSignalNameAvailable(signalNameField.getText()),
+                signalNameField.textProperty(), signals, signalSelectorComboBox.valueProperty()
+            )
+        );
+    }
+
+    private boolean isAnySignalSelected(){
+        return signalSelectorComboBox.getValue() != null;
     }
 
     @FXML
@@ -134,38 +168,36 @@ public class SignalManagementController {
     @FXML
     private void handleRenameSignal() {
         Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
-        String currentText = signalNameField.getText();
-        if (selected != null && currentText != null && currentText.length() >= 3) {
-            boolean nameExists = signals.stream()
-                    .filter(s -> s != selected)
-                    .anyMatch(s -> s.getName().equals(currentText));
+        if(selected == null)
+            return;
 
-//            if (!nameExists) {
-//                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == selected);
-//                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == selected);
-//
-//                selected.setName(currentText);
-//                int selectedIndex = signalSelectorComboBox.getSelectionModel().getSelectedIndex();
-//                signals.set(selectedIndex, selected);
-//
-//                signalSelectorComboBox.getSelectionModel().select(selectedIndex);
-//                if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(selected);
-//                if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(selected);
-//
-//                redrawCharts();
-//            } else {
-//                signalNameField.setText(selected.getName());
-//            }
-        }
+        String newSignalName = signalNameField.getText();
+        if(!signalRepo.isSignalNameAvailable(newSignalName))
+            return;
+
+        selected.setName(newSignalName);
+
+//        Replacing itself with itself to trigger observable updates
+        int selectedIndex = signalSelectorComboBox.getSelectionModel().getSelectedIndex();
+        signals.set(selectedIndex, selected);
+        signalSelectorComboBox.getSelectionModel().select(selectedIndex);
     }
 
     @FXML
     private void handleCloneSignal() {
         Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (selected == null)
+            return;
 
         Signal cloned = selected.deepCopy();
+        String originalName = cloned.getName();
+        int cloneIndex = 1;
+        while(!signalRepo.isSignalNameAvailable(cloned.getName())){
+            cloned.setName(originalName + " (" + cloneIndex + ")");
+            cloneIndex++;
+        }
         signalRepo.addSignal(cloned);
+
         signalSelectorComboBox.getSelectionModel().select(cloned);
     }
 

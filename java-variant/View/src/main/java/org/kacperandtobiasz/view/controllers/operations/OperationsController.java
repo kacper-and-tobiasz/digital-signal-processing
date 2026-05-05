@@ -1,5 +1,6 @@
 package org.kacperandtobiasz.view.controllers.operations;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.ScatterChart;
@@ -13,4 +14,6 @@ import org.kacperandtobiasz.view.MainContext;
 public class OperationsController {
     public OperationsController(MainContext mainContext) {
     }
+
+
 }
