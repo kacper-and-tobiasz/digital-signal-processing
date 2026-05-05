@@ -1,7 +1,6 @@
 package org.kacperandtobiasz.view.services;
 
 import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
@@ -10,50 +9,75 @@ import org.kacperandtobiasz.model.base.signal.Signal;
 import java.util.logging.Logger;
 
 public class GraphService {
-    private BarChart barChart;
-    private ScatterChart<Number, Number> scatterChart;
+    private BarChart resultBarChart;
+    private ScatterChart<Number, Number> resultScatterChart;
+    private Signal currentSignal;
 
     private int histogramBinCount = 10;
 
-    public void setBarChartInstance(BarChart barChart) {
+    public void setResultBarChart(BarChart barChart) {
         if(barChart == null)
             throw new NullPointerException("barChart is null");
-        this.barChart = barChart;
+        this.resultBarChart = barChart;
     }
 
-    public void setScatterChartInstance(ScatterChart<Number, Number> scatterChart) {
+    public void setResultScatterChart(ScatterChart<Number, Number> scatterChart) {
         if(scatterChart == null)
             throw new NullPointerException("scatterChart is null");
-        this.scatterChart = scatterChart;
+        this.resultScatterChart = scatterChart;
     }
 
     public void setHistogramBinCount(int histogramBinCount) {
         if(histogramBinCount < 1)
             histogramBinCount = 1;
         this.histogramBinCount = histogramBinCount;
+
+        drawCurrentSignalGraphs();
     }
 
     public int getHistogramBinCount() {
         return histogramBinCount;
     }
 
-    public void drawSignalGraphs(Signal signal) {
-        if (scatterChart == null)
-            throw new NullPointerException("GraphService has no ScatterChart connected. Set it using setScatterChartInstance() before calling drawSignal().");
-        if (barChart == null)
-            throw new NullPointerException("GraphService has no BarChart connected. Set it using setBarChartInstance() before calling drawSignal().");
-
-        if (signal == null)
-            throw new NullPointerException("Signal is null. Cannot draw null signal.");
-        if (!signal.isSampled())
-            throw new NullPointerException("Signal is not sampled. Cannot draw signal with no discrete data points.");
-
-        DiscreteSignal ds = signal.getDiscreteSignal();
-        drawScatterChart(ds);
-        drawBarChart(ds);
+    public void setCurrentSignal(Signal currentSignal) {
+        this.currentSignal = currentSignal;
     }
 
-    private void drawScatterChart(DiscreteSignal ds) {
+    public void drawCurrentSignalGraphs() {
+        if (currentSignal == null)
+            throw new NullPointerException("currentSignal is null");
+        if (!currentSignal.isSampled())
+            throw new NullPointerException("currentSignal is not sampled");
+
+        drawCurrentSignalBarChart();
+        drawCurrentSignalScatterChart();
+    }
+
+    public void drawCurrentSignalScatterChart(){
+        if (resultScatterChart == null)
+            throw new NullPointerException("GraphService has no ScatterChart connected. Set it using setScatterChartInstance() before calling drawSignal().");
+        if (currentSignal == null)
+            return;
+        if (!currentSignal.isSampled())
+            return;
+
+        DiscreteSignal ds = currentSignal.getDiscreteSignal();
+        drawScatterChart(ds, resultScatterChart);
+    }
+
+    public void drawCurrentSignalBarChart(){
+        if (resultBarChart == null)
+            throw new NullPointerException("GraphService has no BarChart connected. Set it using setBarChartInstance() before calling drawSignal().");
+        if (currentSignal == null)
+            return;
+        if (!currentSignal.isSampled())
+            return;
+
+        DiscreteSignal ds = currentSignal.getDiscreteSignal();
+        drawBarChart(ds, resultBarChart);
+    }
+
+    public void drawScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
         XYChart.Series<Number, Number> scatterSeries = new XYChart.Series<>();
 
         scatterChart.getData().clear();
@@ -83,7 +107,7 @@ public class GraphService {
         return new MinMax(min, max);
     }
 
-    private void drawBarChart(DiscreteSignal discreteSignal){
+    private void drawBarChart(DiscreteSignal discreteSignal, BarChart barChart){
         barChart.getData().clear();
 //        ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
 

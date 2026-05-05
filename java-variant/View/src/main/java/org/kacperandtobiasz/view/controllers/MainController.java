@@ -46,83 +46,80 @@ public class MainController {
         this.signalRepo.setBackingList(signals);
     }
 
-    private void setupDropdownContents(){
-        signal_selector.setItems(signals);
-        signal_selector1.setItems(signals);
-        signal_selector2.setItems(signals);
+//    private void setupDropdownContents(){
+//
+//        signal_selector1.setItems(signals);
+//        signal_selector2.setItems(signals);
+//
+//        operation_type.getSelectionModel().select(0);
+//    }
 
-        operation_type.getSelectionModel().select(0);
-    }
 
-    private void setupSignalTypeSelector(){
-        signal_type.getItems().addAll(SignalType.values());
-        signal_type.getSelectionModel().select(SignalType.SIN);
-    }
 
-    private void setupPaneSwitchGraphRedrawTrigger(){
-        if (main_tabpane != null) {
-            main_tabpane.getSelectionModel().selectedItemProperty().addListener(
-                    (obs, oldTab, newTab) -> redrawCharts()
-            );
-        }
-    }
+//    private void setupPaneSwitchGraphRedrawTrigger(){
+//        if (main_tabpane != null) {
+//            main_tabpane.getSelectionModel().selectedItemProperty().addListener(
+//                    (obs, oldTab, newTab) -> redrawCharts()
+//            );
+//        }
+//    }
 
-    private void setupControlsInteractions(){
-//        Only matching signal properties can be set for a given signal type.
-        signal_type.valueProperty().addListener(
-                (obs, oldVal, newVal) -> updateControlStates(newVal)
-        );
-
-//        If signal instance is not selected, user can't set parameters for it
-        general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
-        specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
-        generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-        save_button.disableProperty().bind(
-                signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
-        );
-
-//        Can't clone or delete something that isn't there
-        clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-        delete_button.disableProperty().bind(signal_selector.valueProperty().isNull());
-
-//        Before creation signal has to have a name
-        create_button.disableProperty().bind(
-            Bindings.createBooleanBinding(() -> {
-                String text = signal_name.getText();
-                if (text == null || text.length() < 3) return true;
-                return signals.stream().anyMatch(s -> s.getName().equals(text));
-            }, signal_name.textProperty(), signals)
-        );
-
-        rename_button.disableProperty().bind(
-            Bindings.createBooleanBinding(() -> {
-                if (signal_selector.getValue() == null) return true;
-                String text = signal_name.getText();
-                if (text == null || text.length() < 3) return true;
-                return signals.stream()
-                        .filter(s -> s != signal_selector.getValue())
-                        .anyMatch(s -> s.getName().equals(text));
-            }, signal_name.textProperty(), signals, signal_selector.valueProperty())
-        );
-
-        if (calcuate_button != null) {
-            calcuate_button.disableProperty().bind(
-                    Bindings.createBooleanBinding(() -> {
-                        String text = result_signal_name != null ? result_signal_name.getText() : "";
-                        boolean noNames = text == null || text.trim().isEmpty();
-                        boolean noSignal1 = (signal_selector1 == null || signal_selector1.getValue() == null);
-                        boolean noSignal2 = (signal_selector2 == null || signal_selector2.getValue() == null);
-
-                        boolean notSampled = false;
-                        if (!noSignal1 && !noSignal2) {
-                            notSampled = !signal_selector1.getValue().isSampled() || !signal_selector2.getValue().isSampled();
-                        }
-
-                        return noNames || noSignal1 || noSignal2 || notSampled;
-                    }, result_signal_name.textProperty(), signal_selector1.valueProperty(), signal_selector2.valueProperty())
-            );
-        }
-    }
+//    private void setupControlsInteractions(){
+////        Only matching signal properties can be set for a given signal type.
+//        signal_type.valueProperty().addListener(
+//                (obs, oldVal, newVal) -> updateControlStates(newVal)
+//        );
+//
+////        If signal instance is not selected, user can't set parameters for it
+//        general_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
+//        specific_signal_settings.disableProperty().bind(signal_selector.valueProperty().isNull());
+//        generate_button.disableProperty().bind(signal_selector.valueProperty().isNull());
+//        save_button.disableProperty().bind(
+//                signal_selector.valueProperty().isNull().or(selectedSignalSampled.not())
+//        );
+//
+////        Can't clone or delete something that isn't there
+//        clone_button.disableProperty().bind(signal_selector.valueProperty().isNull());
+//        delete_button.disableProperty().bind(signal_selector.valueProperty().isNull());
+//
+////        Before creation signal has to have a name
+//        create_button.disableProperty().bind(
+//            Bindings.createBooleanBinding(() -> {
+//                String text = signal_name.getText();
+//                if (text == null || text.length() < 3) return true;
+//                return signals.stream().anyMatch(s -> s.getName().equals(text));
+//            }, signal_name.textProperty(), signals)
+//        );
+//
+//        rename_button.disableProperty().bind(
+//            Bindings.createBooleanBinding(() -> {
+//                if (signal_selector.getValue() == null) return true;
+//                String text = signal_name.getText();
+//                if (text == null || text.length() < 3) return true;
+//                return signals.stream()
+//                        .filter(s -> s != signal_selector.getValue())
+//                        .anyMatch(s -> s.getName().equals(text));
+//            }, signal_name.textProperty(), signals, signal_selector.valueProperty())
+//        );
+//
+//        if (calcuate_button != null) {
+//            calcuate_button.disableProperty().bind(
+//                    Bindings.createBooleanBinding(() -> {
+//                        String text = result_signal_name != null ? result_signal_name.getText() : "";
+//                        boolean noNames = text == null || text.trim().isEmpty();
+//                        boolean noSignal1 = (signal_selector1 == null || signal_selector1.getValue() == null);
+//                        boolean noSignal2 = (signal_selector2 == null || signal_selector2.getValue() == null);
+//
+//                        boolean notSampled = false;
+//                        if (!noSignal1 && !noSignal2) {
+//                            notSampled = !signal_selector1.getValue().isSampled() || !signal_selector2.getValue().isSampled();
+//                        }
+//
+//                        return noNames || noSignal1 || noSignal2 || notSampled;
+//                    }, result_signal_name.textProperty(), signal_selector1.valueProperty(), signal_selector2.valueProperty())
+//            );
+//        }
+//    }
 
     private void setupEscapeKeyFocusReset(){
         Platform.runLater(() -> {
@@ -140,278 +137,188 @@ public class MainController {
     // Called after scene graph has been loaded and objects are accessible for post-processing.
     @FXML
     private void initialize() {
-        setupDropdownContents();
-        setupGraphSourceListeners();
-        setupFrequencyPeriodBinding();
-        setupSignalTypeSelector();
-        setupPaneSwitchGraphRedrawTrigger();
-        setupControlsInteractions();
+//        setupDropdownContents();
+//        setupGraphSourceListeners();
+//        setupFrequencyPeriodBinding();
+//        setupSignalTypeSelector();
+//        setupPaneSwitchGraphRedrawTrigger();
+//        setupControlsInteractions();
         setupEscapeKeyFocusReset();
-        setupHistogramBinSliders();
-        setupParameterUpdateOnSignalChange();
-
-        updateControlStates(signal_type.getValue());
+//        setupHistogramBinSliders();
+//        setupParameterUpdateOnSignalChange();
+//
+//        updateControlStates(signal_type.getValue());
     }
 
-    private void setupParameterUpdateOnSignalChange() {
-        signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                signal_name.setText(newVal.getName());
-                selectedSignalSampled.set(newVal.isSampled());
-
-                if (newVal.getGenerator() != null) {
-                    SignalParameters params = newVal.getGenerator().getParameters();
-                    signal_type.getSelectionModel().select(newVal.getGenerator().getSignalType());
-
-                    amplitude.getValueFactory().setValue(params.getAmplitude());
-                    if (signal_start != null) signal_start.getValueFactory().setValue(params.getStartTime());
-                    if (signal_duration != null) signal_duration.getValueFactory().setValue(params.getDuration());
-
-                    if (base_period != null) base_period.getValueFactory().setValue(params.getPeriod());
-                    if (duty_cycle != null) duty_cycle.getValueFactory().setValue(params.getDutyCycle());
-                    if (jump_time != null) jump_time.getValueFactory().setValue(params.getJumpTime());
-                    if (probability != null) probability.getValueFactory().setValue(params.getProbability());
-
-                    if (first_sample != null) first_sample.getValueFactory().setValue(params.getFirstSample());
-                    if (jump_sample != null) jump_sample.getValueFactory().setValue(params.getJumpSample());
-                    if (sample_length != null) sample_length.getValueFactory().setValue(params.getSampleLength());
-                }
-                if (sampling_rate != null) sampling_rate.getValueFactory().setValue(newVal.getSamplingFrequency());
-
-                drawSignal(newVal, signal_chart, signal_bar_chart);
-            } else {
-                selectedSignalSampled.set(false);
-                drawSignal(null, signal_chart, signal_bar_chart);
-            }
-        });
-    }
-
-    private void redrawCharts() {
-        Signal editorSignal = signal_selector != null ? signal_selector.getValue() : null;
-        drawSignal(editorSignal, signal_chart, signal_bar_chart);
-
-        redrawOperationPreviewCharts();
-
-        drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
-    }
-
-    private void redrawOperationPreviewCharts() {
-        Signal operationSignal1 = signal_selector1 != null ? signal_selector1.getValue() : null;
-        drawSignal(operationSignal1, signal_chart1, null);
-
-        Signal operationSignal2 = signal_selector2 != null ? signal_selector2.getValue() : null;
-        drawSignal(operationSignal2, signal_chart2, null);
-    }
-
-    private void updateControlStates(SignalType type) {
-        if (type == null) return;
-
-        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT ||
-                type == SignalType.SIN_FULL_RECT || type == SignalType.RECT ||
-                type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
-
-        boolean usesDutyCycle = type == SignalType.RECT || type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
-        boolean usesJumpTime = type == SignalType.UNIT_JUMP;
-        boolean usesProbability = type == SignalType.IMPULSE_NOISE;
-        boolean usesDiscreteParams = type == SignalType.UNIT_IMPULSE || type == SignalType.IMPULSE_NOISE;
-        boolean usesContinuousParams = !usesDiscreteParams;
-
-        base_period.setDisable(!usesPeriod);
-        signal_frequency.setDisable(!usesPeriod);
-        duty_cycle.setDisable(!usesDutyCycle);
-        if (jump_time != null) jump_time.setDisable(!usesJumpTime);
-        if (probability != null) probability.setDisable(!usesProbability);
-
-        if (signal_start != null) signal_start.setDisable(!usesContinuousParams);
-        if (signal_duration != null) signal_duration.setDisable(!usesContinuousParams);
-
-        if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
-        if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
-        if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
-    }
-
-    private void drawSignal(Signal signal, ScatterChart scatterChart, BarChart barChart) {
-        if (scatterChart == null) return;
-        
-        if (signal == null || !signal.isSampled()) {
-            scatterChart.getData().clear();
-            if (barChart != null) {
-                barChart.getData().clear();
-                if (barChart.getXAxis() instanceof CategoryAxis) {
-                    ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
-                }
-                updateStatistics(null);
-            }
-            return;
-        }
-
-        DiscreteSignal ds = signal.getDiscreteSignal();
-        
-        if (barChart != null) {
-            updateStatistics(signal);
-        }
-        
-        XYChart.Series<Number, Number> scatterSeries;
-        if (scatterChart.getData().isEmpty()) {
-            scatterSeries = new XYChart.Series<>();
-            scatterChart.getData().add(scatterSeries);
-        } else {
-            scatterSeries = (XYChart.Series<Number, Number>) scatterChart.getData().get(0);
-            scatterSeries.getData().clear();
-        }
-
-        double min = Double.MAX_VALUE;
-        double max = -Double.MAX_VALUE;
-
-        for (int i = 0; i < ds.getSampleCount(); i++) {
-            double val = ds.getSample(i);
-            scatterSeries.getData().add(new XYChart.Data<>(ds.getTimeAtIndex(i), val));
-            if (val < min) min = val;
-            if (val > max) max = val;
-        }
-
-        if (barChart != null) {
-            // Histogram logic
-            int bins = 10;
-            if (barChart == signal_bar_chart && histogram_bins_slider != null) {
-                bins = (int) histogram_bins_slider.getValue();
-            } else if (barChart == result_signal_barchart && result_histogram_bins_slider != null) {
-                bins = (int) result_histogram_bins_slider.getValue();
-            }
-            
-            if (bins <= 0) bins = 10;
-
-            int[] counts = new int[bins];
-            double binWidth = (max - min) / bins;
-            if (binWidth <= 0) binWidth = 1.0;
-
-            for (int i = 0; i < ds.getSampleCount(); i++) {
-                double val = ds.getSample(i);
-                int binIndex = (int) ((val - min) / binWidth);
-                if (binIndex >= bins) {
-                    binIndex = bins - 1; // Put max value in the last bin
-                }
-                if (binIndex < 0) {
-                    binIndex = 0;
-                }
-                counts[binIndex]++;
-            }
-
-            XYChart.Series barSeries;
-            if (barChart.getData().isEmpty()) {
-                barSeries = new XYChart.Series();
-                barChart.getData().add(barSeries);
-            } else {
-                barSeries = (XYChart.Series) barChart.getData().get(0);
-                barSeries.getData().clear();
-                if (barChart.getXAxis() instanceof CategoryAxis) {
-                    ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
-                }
-            }
-
-            for (int i = 0; i < bins; i++) {
-                double binStart = min + i * binWidth;
-                double binEnd = min + (i + 1) * binWidth;
-                String label = String.format("%.2f-%.2f", binStart, binEnd);
-                barSeries.getData().add(new XYChart.Data(label, counts[i]));
-            }
-        }
-    }
-
-
-
-    @FXML
-    private void handleCalculateOperation() {
-        Signal s1 = signal_selector1 != null ? signal_selector1.getValue() : null;
-        Signal s2 = signal_selector2 != null ? signal_selector2.getValue() : null;
-        String op = operation_type != null ? operation_type.getValue() : null;
-        String resName = result_signal_name != null ? result_signal_name.getText() : null;
-
-        if (s1 == null || s2 == null || op == null) {
-            showError("Błąd kalkulacji", "Upewnij się, że oba sygnały oraz rodzaj operacji zostały wybrane.");
-            return;
-        }
-        
-        if (resName == null || resName.trim().isEmpty()) {
-            showError("Brak nazwy", "Sygnał wynikowy musi posiadać odpowiednią nazwę.");
-            return;
-        }
-
-        try {
-            Signal result = null;
-            int skippedDivisionSamples = 0;
-            Signal previouslySelectedEditorSignal = signal_selector != null ? signal_selector.getValue() : null;
-            switch (op) {
-                case "Dodawanie":
-                    result = s1.add(resName, s2);
-                    break;
-                case "Odejmowanie":
-                    result = s1.subtract(resName, s2);
-                    break;
-                case "Mnożenie":
-                    result = s1.multiply(resName, s2);
-                    break;
-                case "Dzielenie":
-                    skippedDivisionSamples = s1.countDivisionSkippedSamples(s2);
-                    result = s1.divide(resName, s2);
-                    break;
-            }
-
-            if (result != null) {
-                Signal existingSignal = signals.stream()
-                        .filter(s -> s.getName().equals(resName))
-                        .findFirst()
-                        .orElse(null);
-
-                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
-                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
-                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
-
-                if (existingSignal != null) {
-                    int existingSignalIndex = signals.indexOf(existingSignal);
-                    if (existingSignalIndex >= 0) {
-                        signals.set(existingSignalIndex, result);
-                    } else {
-                        signalRepo.addSignal(result);
-                    }
-                } else {
-                    signalRepo.addSignal(result);
-                }
-
-                if (selMainMatch && signal_selector != null) {
-                    signal_selector.getSelectionModel().select(result);
-                } else if (signal_selector != null && previouslySelectedEditorSignal != null && signals.contains(previouslySelectedEditorSignal)) {
-                    signal_selector.getSelectionModel().select(previouslySelectedEditorSignal);
-                }
-
-                if (sel1Match && signal_selector1 != null) {
-                    signal_selector1.getSelectionModel().select(result);
-                }
-                if (sel2Match && signal_selector2 != null) {
-                    signal_selector2.getSelectionModel().select(result);
-                }
-
-                lastOperationResult = result;
-                
-                // Upewniamy się, że podglądy starych sygnałów zostaną przerysowane tak jak proszono
-                redrawCharts();
-
-                if ("Dzielenie".equals(op) && skippedDivisionSamples > 0) {
-                    showError(
-                            "Ostrzeżenie dzielenia",
-                            "Niektóre próbki zostały zastąpione zerem, ponieważ wartość mianownika była mniejsza niż epsilon. " +
-                                    "Liczba takich próbek: " + skippedDivisionSamples + "."
-                    );
-
-                    // Ensure charts are repainted after modal dialog is closed.
-                    drawSignal(result, result_signal_chart, result_signal_barchart);
-                }
-            
-            }
-        } catch (Exception e) {
-            showError("Błąd kalkulacji sygnałów", e.getMessage());
-        }
-    }
+//    private void setupParameterUpdateOnSignalChange() {
+//        signal_selector.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+//            if (newVal != null) {
+//                signal_name.setText(newVal.getName());
+//                selectedSignalSampled.set(newVal.isSampled());
+//
+//                if (newVal.getGenerator() != null) {
+//                    SignalParameters params = newVal.getGenerator().getParameters();
+//                    signal_type.getSelectionModel().select(newVal.getGenerator().getSignalType());
+//
+//                    amplitude.getValueFactory().setValue(params.getAmplitude());
+//                    if (signal_start != null) signal_start.getValueFactory().setValue(params.getStartTime());
+//                    if (signal_duration != null) signal_duration.getValueFactory().setValue(params.getDuration());
+//
+//                    if (base_period != null) base_period.getValueFactory().setValue(params.getPeriod());
+//                    if (duty_cycle != null) duty_cycle.getValueFactory().setValue(params.getDutyCycle());
+//                    if (jump_time != null) jump_time.getValueFactory().setValue(params.getJumpTime());
+//                    if (probability != null) probability.getValueFactory().setValue(params.getProbability());
+//
+//                    if (first_sample != null) first_sample.getValueFactory().setValue(params.getFirstSample());
+//                    if (jump_sample != null) jump_sample.getValueFactory().setValue(params.getJumpSample());
+//                    if (sample_length != null) sample_length.getValueFactory().setValue(params.getSampleLength());
+//                }
+//                if (sampling_rate != null) sampling_rate.getValueFactory().setValue(newVal.getSamplingFrequency());
+//
+//                drawSignal(newVal, signal_chart, signal_bar_chart);
+//            } else {
+//                selectedSignalSampled.set(false);
+//                drawSignal(null, signal_chart, signal_bar_chart);
+//            }
+//        });
+//    }
+//
+//    private void redrawCharts() {
+//        Signal editorSignal = signal_selector != null ? signal_selector.getValue() : null;
+//        drawSignal(editorSignal, signal_chart, signal_bar_chart);
+//
+//        redrawOperationPreviewCharts();
+//
+//        drawSignal(lastOperationResult, result_signal_chart, result_signal_barchart);
+//    }
+//
+//    private void redrawOperationPreviewCharts() {
+//        Signal operationSignal1 = signal_selector1 != null ? signal_selector1.getValue() : null;
+//        drawSignal(operationSignal1, signal_chart1, null);
+//
+//        Signal operationSignal2 = signal_selector2 != null ? signal_selector2.getValue() : null;
+//        drawSignal(operationSignal2, signal_chart2, null);
+//    }
+//
+//    private void updateControlStates(SignalType type) {
+//        if (type == null) return;
+//
+//        boolean usesPeriod = type == SignalType.SIN || type == SignalType.SIN_HALF_RECT ||
+//                type == SignalType.SIN_FULL_RECT || type == SignalType.RECT ||
+//                type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
+//
+//        boolean usesDutyCycle = type == SignalType.RECT || type == SignalType.RECT_SYMMETRIC || type == SignalType.TRIAN;
+//        boolean usesJumpTime = type == SignalType.UNIT_JUMP;
+//        boolean usesProbability = type == SignalType.IMPULSE_NOISE;
+//        boolean usesDiscreteParams = type == SignalType.UNIT_IMPULSE || type == SignalType.IMPULSE_NOISE;
+//        boolean usesContinuousParams = !usesDiscreteParams;
+//
+//        base_period.setDisable(!usesPeriod);
+//        signal_frequency.setDisable(!usesPeriod);
+//        duty_cycle.setDisable(!usesDutyCycle);
+//        if (jump_time != null) jump_time.setDisable(!usesJumpTime);
+//        if (probability != null) probability.setDisable(!usesProbability);
+//
+//        if (signal_start != null) signal_start.setDisable(!usesContinuousParams);
+//        if (signal_duration != null) signal_duration.setDisable(!usesContinuousParams);
+//
+//        if (first_sample != null) first_sample.setDisable(!usesDiscreteParams);
+//        if (jump_sample != null) jump_sample.setDisable(type != SignalType.UNIT_IMPULSE);
+//        if (sample_length != null) sample_length.setDisable(!usesDiscreteParams);
+//    }
+//
+//    @FXML
+//    private void handleCalculateOperation() {
+//        Signal s1 = signal_selector1 != null ? signal_selector1.getValue() : null;
+//        Signal s2 = signal_selector2 != null ? signal_selector2.getValue() : null;
+//        String op = operation_type != null ? operation_type.getValue() : null;
+//        String resName = result_signal_name != null ? result_signal_name.getText() : null;
+//
+//        if (s1 == null || s2 == null || op == null) {
+//            showError("Błąd kalkulacji", "Upewnij się, że oba sygnały oraz rodzaj operacji zostały wybrane.");
+//            return;
+//        }
+//
+//        if (resName == null || resName.trim().isEmpty()) {
+//            showError("Brak nazwy", "Sygnał wynikowy musi posiadać odpowiednią nazwę.");
+//            return;
+//        }
+//
+//        try {
+//            Signal result = null;
+//            int skippedDivisionSamples = 0;
+//            Signal previouslySelectedEditorSignal = signal_selector != null ? signal_selector.getValue() : null;
+//            switch (op) {
+//                case "Dodawanie":
+//                    result = s1.add(resName, s2);
+//                    break;
+//                case "Odejmowanie":
+//                    result = s1.subtract(resName, s2);
+//                    break;
+//                case "Mnożenie":
+//                    result = s1.multiply(resName, s2);
+//                    break;
+//                case "Dzielenie":
+//                    skippedDivisionSamples = s1.countDivisionSkippedSamples(s2);
+//                    result = s1.divide(resName, s2);
+//                    break;
+//            }
+//
+//            if (result != null) {
+//                Signal existingSignal = signals.stream()
+//                        .filter(s -> s.getName().equals(resName))
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
+//                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
+//                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
+//
+//                if (existingSignal != null) {
+//                    int existingSignalIndex = signals.indexOf(existingSignal);
+//                    if (existingSignalIndex >= 0) {
+//                        signals.set(existingSignalIndex, result);
+//                    } else {
+//                        signalRepo.addSignal(result);
+//                    }
+//                } else {
+//                    signalRepo.addSignal(result);
+//                }
+//
+//                if (selMainMatch && signal_selector != null) {
+//                    signal_selector.getSelectionModel().select(result);
+//                } else if (signal_selector != null && previouslySelectedEditorSignal != null && signals.contains(previouslySelectedEditorSignal)) {
+//                    signal_selector.getSelectionModel().select(previouslySelectedEditorSignal);
+//                }
+//
+//                if (sel1Match && signal_selector1 != null) {
+//                    signal_selector1.getSelectionModel().select(result);
+//                }
+//                if (sel2Match && signal_selector2 != null) {
+//                    signal_selector2.getSelectionModel().select(result);
+//                }
+//
+//                lastOperationResult = result;
+//
+//                // Upewniamy się, że podglądy starych sygnałów zostaną przerysowane tak jak proszono
+//                redrawCharts();
+//
+//                if ("Dzielenie".equals(op) && skippedDivisionSamples > 0) {
+//                    showError(
+//                            "Ostrzeżenie dzielenia",
+//                            "Niektóre próbki zostały zastąpione zerem, ponieważ wartość mianownika była mniejsza niż epsilon. " +
+//                                    "Liczba takich próbek: " + skippedDivisionSamples + "."
+//                    );
+//
+//                    // Ensure charts are repainted after modal dialog is closed.
+//                    drawSignal(result, result_signal_chart, result_signal_barchart);
+//                }
+//
+//            }
+//        } catch (Exception e) {
+//            showError("Błąd kalkulacji sygnałów", e.getMessage());
+//        }
+//    }
 
 
 

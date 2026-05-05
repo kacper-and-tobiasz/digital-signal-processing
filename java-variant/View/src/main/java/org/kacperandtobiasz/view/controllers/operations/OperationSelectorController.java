@@ -8,8 +8,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import org.kacperandtobiasz.model.base.signal.Signal;
+import org.kacperandtobiasz.view.MainContext;
+import org.kacperandtobiasz.view.services.GraphService;
 
 public class OperationSelectorController {
+
+    private final MainContext mainContext;
+    private final GraphService graphService;
 
     @FXML
     public ComboBox<Signal> signal_selector1;
@@ -27,16 +32,28 @@ public class OperationSelectorController {
     @FXML
     public Button calcuate_button;
 
-    public OperationSelectorController() {
+    public OperationSelectorController(MainContext mainContext) {
+        this.mainContext = mainContext;
+        this.graphService = mainContext.graphService();
+    }
+
+    @FXML
+    private void initialize() {
+        setupGraphSourceListeners();
     }
 
     private void setupGraphSourceListeners(){
         signal_selector1.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            drawSignal(newVal, signal_chart1, null);
+            graphService.drawScatterChart(newVal.getDiscreteSignal(), signal_chart1);
         });
 
         signal_selector2.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            drawSignal(newVal, signal_chart2, null);
+            graphService.drawScatterChart(newVal.getDiscreteSignal(), signal_chart2);
         });
+    }
+
+    @FXML
+    private void handleCalculateOperation() {
+        //fill
     }
 }

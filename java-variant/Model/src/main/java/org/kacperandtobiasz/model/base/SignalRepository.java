@@ -5,7 +5,11 @@ import org.kacperandtobiasz.model.base.signal.Signal;
 import java.util.*;
 
 public class SignalRepository {
-    private List<Signal> signals = new ArrayList<>();
+    private List<Signal> signals;
+
+    public SignalRepository(List<Signal> signals) {
+        this.signals = signals;
+    }
 
     public void addSignal(Signal signal){
         signals.add(signal);
@@ -15,17 +19,14 @@ public class SignalRepository {
         signals.remove(signal);
     }
 
-    public Collection<Signal> getSignals(){
+    public List<Signal> getSignals(){
         return signals;
     }
 
-    /**
-     * Replaces underlying repository list.
-     * 
-     * @param backingList a list to fill with existing signals and to be used inside a repository.
-     */
     public void setBackingList(List<Signal> backingList){
-        backingList.addAll(signals);
+        if (signals != null) {
+            backingList.addAll(signals);
+        }
         this.signals = backingList;
     }
 }

@@ -2,15 +2,19 @@ package org.kacperandtobiasz.view.controllers.editor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
-import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.view.MainContext;
+import org.kacperandtobiasz.view.services.GraphService;
 
 public class GraphSettingsController {
     @FXML
     public Slider histogram_bins_slider;
 
-    public GraphSettingsController(MainContext mainContext) {
+    private MainContext mainContext;
+    private GraphService graphService;
 
+    public GraphSettingsController(MainContext mainContext) {
+        this.mainContext = mainContext;
+        this.graphService = mainContext.graphService();
     }
 
     @FXML
@@ -21,10 +25,7 @@ public class GraphSettingsController {
     private void setupHistogramBinSlider(){
         if (histogram_bins_slider != null) {
             histogram_bins_slider.valueProperty().addListener((obs, oldVal, newVal) -> {
-                Signal currentSignal = signal_selector.getSelectionModel().getSelectedItem();
-                if (currentSignal != null && currentSignal.isSampled()) {
-                    drawSignal(currentSignal, signal_chart, signal_bar_chart);
-                }
+                graphService.setHistogramBinCount(newVal.intValue());
             });
         }
     }

@@ -1,11 +1,13 @@
 package org.kacperandtobiasz.view.controllers.editor;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.view.MainContext;
+import org.kacperandtobiasz.view.SignalParameterState;
 
 public class SignalSettingsController {
     @FXML
@@ -42,12 +44,62 @@ public class SignalSettingsController {
     @FXML
     public VBox specific_signal_settings;
 
+    private final SignalParameterState signalParameters;
+
     public SignalSettingsController(MainContext mainContext) {
+        this.signalParameters = mainContext.signalParameters();
     }
 
     @FXML
     private void initialize() {
+        setupSignalTypeSelector();
+        bindToContext();
         setupFrequencyPeriodBinding();
+    }
+
+    private void bindToContext() {
+        if (signal_type != null) {
+            signal_type.valueProperty().bindBidirectional(signalParameters.signalType());
+        }
+
+        if (amplitude != null && amplitude.getValueFactory() != null) {
+            Bindings.bindBidirectional(amplitude.getValueFactory().valueProperty(), signalParameters.amplitude().asObject());
+        }
+        if (signal_start != null && signal_start.getValueFactory() != null) {
+            Bindings.bindBidirectional(signal_start.getValueFactory().valueProperty(), signalParameters.signalStart().asObject());
+        }
+        if (signal_duration != null && signal_duration.getValueFactory() != null) {
+            Bindings.bindBidirectional(signal_duration.getValueFactory().valueProperty(), signalParameters.signalDuration().asObject());
+        }
+        if (base_period != null && base_period.getValueFactory() != null) {
+            Bindings.bindBidirectional(base_period.getValueFactory().valueProperty(), signalParameters.basePeriod().asObject());
+        }
+        if (duty_cycle != null && duty_cycle.getValueFactory() != null) {
+            Bindings.bindBidirectional(duty_cycle.getValueFactory().valueProperty(), signalParameters.dutyCycle().asObject());
+        }
+        if (sampling_rate != null && sampling_rate.getValueFactory() != null) {
+            Bindings.bindBidirectional(sampling_rate.getValueFactory().valueProperty(), signalParameters.samplingRate().asObject());
+        }
+        if (jump_time != null && jump_time.getValueFactory() != null) {
+            Bindings.bindBidirectional(jump_time.getValueFactory().valueProperty(), signalParameters.jumpTime().asObject());
+        }
+        if (probability != null && probability.getValueFactory() != null) {
+            Bindings.bindBidirectional(probability.getValueFactory().valueProperty(), signalParameters.probability().asObject());
+        }
+        if (first_sample != null && first_sample.getValueFactory() != null) {
+            Bindings.bindBidirectional(first_sample.getValueFactory().valueProperty(), signalParameters.firstSample().asObject());
+        }
+        if (jump_sample != null && jump_sample.getValueFactory() != null) {
+            Bindings.bindBidirectional(jump_sample.getValueFactory().valueProperty(), signalParameters.jumpSample().asObject());
+        }
+        if (sample_length != null && sample_length.getValueFactory() != null) {
+            Bindings.bindBidirectional(sample_length.getValueFactory().valueProperty(), signalParameters.sampleLength().asObject());
+        }
+    }
+
+    private void setupSignalTypeSelector(){
+        signal_type.getItems().addAll(SignalType.values());
+        signal_type.getSelectionModel().select(SignalType.SIN);
     }
 
     private void setupFrequencyPeriodBinding(){
@@ -74,5 +126,10 @@ public class SignalSettingsController {
                 signal_frequency.getValueFactory().setValue(0.01);
             }
         });
+    }
+
+    @FXML
+    private void handleGenerateSignal(){
+        //fill
     }
 }

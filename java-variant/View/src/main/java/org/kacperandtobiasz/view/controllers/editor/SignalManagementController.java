@@ -1,22 +1,23 @@
 package org.kacperandtobiasz.view.controllers.editor;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.kacperandtobiasz.model.base.SignalRepository;
 import org.kacperandtobiasz.model.base.signal.*;
 import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.view.MainContext;
+import org.kacperandtobiasz.view.SignalParameterState;
 
 import java.io.File;
 import java.io.IOException;
 
 public class SignalManagementController {
     @FXML
-    public ComboBox<Signal> signal_selector;
+    public ComboBox<Signal> signalSelectorComboBox;
     @FXML
-    public TextField signal_name;
+    public TextField signalNameField;
     @FXML
     public Button rename_button;
     @FXML
@@ -32,15 +33,28 @@ public class SignalManagementController {
     public Button load_button;
 
 
+    private final SignalRepository signalRepo;
+    private final SignalParameterState signalParameters;
+    private ObservableList<Signal> signals;
 
     public SignalManagementController(MainContext mainContext) {
+        this.signalRepo = mainContext.signalRepository();
+        this.signalParameters = mainContext.signalParameters();
+    }
+
+    @FXML
+    private void initialize() {
+        if (signalRepo.getSignals() instanceof ObservableList<Signal> signals) {
+            this.signals = signals;
+            signalSelectorComboBox.setItems(signals);
+        }
     }
 
     @FXML
     private void handleCreateSignal() {
-        String newName = signal_name.getText();
+        String newName = signalNameField.getText();
 
-        SignalType type = signal_type.getValue();
+        SignalType type = signalParameters.getSignalType();
         if (type == null) {
             throw new IllegalArgumentException("Signal type must be selected");
         }
@@ -48,33 +62,33 @@ public class SignalManagementController {
         Signal signal = new Signal(newName, null, 100.0);
 
         signalRepo.addSignal(signal);
-        signal_selector.getSelectionModel().select(signal);
+        signalSelectorComboBox.getSelectionModel().select(signal);
     }
 
     @FXML
     private void handleGenerateSignal() {
-        Signal targetSignal = signal_selector.getSelectionModel().getSelectedItem();
+        Signal targetSignal = signalSelectorComboBox.getSelectionModel().getSelectedItem();
         if (targetSignal == null) return;
 
-        SignalType type = signal_type.getValue();
+        SignalType type = signalParameters.getSignalType();
         if (type == null) {
             throw new IllegalArgumentException("Signal type must be selected");
         }
 
         String name = targetSignal.getName();
-        double amp = amplitude.getValue() != null ? amplitude.getValue() : 1.0;
-        double start = (signal_start != null && signal_start.getValue() != null) ? signal_start.getValue() : 0.0;
-        double dur = (signal_duration != null && signal_duration.getValue() != null) ? signal_duration.getValue() : 1.0;
-        double period = base_period.getValue() != null ? base_period.getValue() : 1.0;
-        double duty = duty_cycle.getValue() != null ? duty_cycle.getValue() : 0.5;
-        double samplingRate = sampling_rate.getValue() != null ? sampling_rate.getValue() : 100.0;
+        double amp = signalParameters.getAmplitude();
+        double start = signalParameters.getSignalStart();
+        double dur = signalParameters.getSignalDuration();
+        double period = signalParameters.getBasePeriod();
+        double duty = signalParameters.getDutyCycle();
+        double samplingRate = signalParameters.getSamplingRate();
 
-        double jump = jump_time.getValue() != null ? jump_time.getValue() : 0.0;
-        double prob = probability.getValue() != null ? probability.getValue() : 0.5;
+        double jump = signalParameters.getJumpTime();
+        double prob = signalParameters.getProbability();
 
-        int firstSamp = (first_sample != null && first_sample.getValue() != null) ? first_sample.getValue() : 0;
-        int jumpSamp = (jump_sample != null && jump_sample.getValue() != null) ? jump_sample.getValue() : 0;
-        int sampLen = (sample_length != null && sample_length.getValue() != null) ? sample_length.getValue() : 100;
+        int firstSamp = signalParameters.getFirstSample();
+        int jumpSamp = signalParameters.getJumpSample();
+        int sampLen = signalParameters.getSampleLength();
 
         SignalParameters params = new SignalParameters(amp, start, dur)
                 .withPeriod(period)
@@ -89,27 +103,27 @@ public class SignalManagementController {
         targetSignal.setGenerator(newComputedState.getGenerator());
         targetSignal.setSamplingFrequency(samplingRate);
         targetSignal.sample();
-        selectedSignalSampled.set(targetSignal.isSampled());
-
-        // Refresh combobox to force cell update if needed (so name etc stay in sync visibly)
-        int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-        if (selectedIndex >= 0) {
-            boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == targetSignal);
-            boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == targetSignal);
-
-            signals.set(selectedIndex, targetSignal);
-
-            signal_selector.getSelectionModel().select(selectedIndex);
-            if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(targetSignal);
-            if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(targetSignal);
-        }
-
-        redrawCharts();
+//        selectedSignalSampled.set(targetSignal.isSampled());
+//
+//        // Refresh combobox to force cell update if needed (so name etc stay in sync visibly)
+//        int selectedIndex = signalSelectorComboBox.getSelectionModel().getSelectedIndex();
+//        if (selectedIndex >= 0) {
+//            boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == targetSignal);
+//            boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == targetSignal);
+//
+//            signals.set(selectedIndex, targetSignal);
+//
+//            signalSelectorComboBox.getSelectionModel().select(selectedIndex);
+//            if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(targetSignal);
+//            if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(targetSignal);
+//        }
+//
+//        redrawCharts();
     }
 
     @FXML
     private void handleDeleteSignal() {
-        Signal signal = signal_selector.getSelectionModel().getSelectedItem();
+        Signal signal = signalSelectorComboBox.getSelectionModel().getSelectedItem();
         if (signal == null) {
             throw new IllegalArgumentException("Signal is null, so it cannot be deleted");
         }
@@ -119,50 +133,50 @@ public class SignalManagementController {
 
     @FXML
     private void handleRenameSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
-        String currentText = signal_name.getText();
+        Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
+        String currentText = signalNameField.getText();
         if (selected != null && currentText != null && currentText.length() >= 3) {
             boolean nameExists = signals.stream()
                     .filter(s -> s != selected)
                     .anyMatch(s -> s.getName().equals(currentText));
 
-            if (!nameExists) {
-                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == selected);
-                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == selected);
-
-                selected.setName(currentText);
-                int selectedIndex = signal_selector.getSelectionModel().getSelectedIndex();
-                signals.set(selectedIndex, selected);
-
-                signal_selector.getSelectionModel().select(selectedIndex);
-                if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(selected);
-                if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(selected);
-
-                redrawCharts();
-            } else {
-                signal_name.setText(selected.getName());
-            }
+//            if (!nameExists) {
+//                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == selected);
+//                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == selected);
+//
+//                selected.setName(currentText);
+//                int selectedIndex = signalSelectorComboBox.getSelectionModel().getSelectedIndex();
+//                signals.set(selectedIndex, selected);
+//
+//                signalSelectorComboBox.getSelectionModel().select(selectedIndex);
+//                if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(selected);
+//                if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(selected);
+//
+//                redrawCharts();
+//            } else {
+//                signalNameField.setText(selected.getName());
+//            }
         }
     }
 
     @FXML
     private void handleCloneSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+        Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
         if (selected == null) return;
 
         Signal cloned = selected.deepCopy();
         signalRepo.addSignal(cloned);
-        signal_selector.getSelectionModel().select(cloned);
+        signalSelectorComboBox.getSelectionModel().select(cloned);
     }
 
     private final SignalFileHandler fileHandler = new SignalFileHandler();
 
     @FXML
     private void handleSaveSignal() {
-        Signal selected = signal_selector.getSelectionModel().getSelectedItem();
+        Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
 
         if (selected == null || !selected.isSampled()) {
-            showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
+//            showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
             return;
         }
 
@@ -175,7 +189,7 @@ public class SignalManagementController {
             try {
                 fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
             } catch (IOException e) {
-                showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
+//                showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
             }
         }
     }
@@ -201,9 +215,9 @@ public class SignalManagementController {
                         .findFirst()
                         .orElse(null);
 
-                boolean selMainMatch = (signal_selector != null && signal_selector.getValue() == existingSignal);
-                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
-                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
+                boolean selMainMatch = (signalSelectorComboBox != null && signalSelectorComboBox.getValue() == existingSignal);
+//                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
+//                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
 
                 if (existingSignal != null) {
                     int existingSignalIndex = signals.indexOf(existingSignal);
@@ -216,19 +230,19 @@ public class SignalManagementController {
                     signalRepo.addSignal(loadedSignal);
                 }
 
-                signal_selector.getSelectionModel().select(loadedSignal);
+                signalSelectorComboBox.getSelectionModel().select(loadedSignal);
 
-                if (sel1Match && signal_selector1 != null) {
-                    signal_selector1.getSelectionModel().select(loadedSignal);
-                }
-                if (sel2Match && signal_selector2 != null) {
-                    signal_selector2.getSelectionModel().select(loadedSignal);
-                }
-
-                redrawCharts();
+//                if (sel1Match && signal_selector1 != null) {
+//                    signal_selector1.getSelectionModel().select(loadedSignal);
+//                }
+//                if (sel2Match && signal_selector2 != null) {
+//                    signal_selector2.getSelectionModel().select(loadedSignal);
+//                }
+//
+//                redrawCharts();
 
             } catch (Exception e) {
-                showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
+//                showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
             }
         }
     }

@@ -12,7 +12,7 @@
       fx:controller="org.kacperandtobiasz.view.controllers.common.SignalGraphsController"
       prefHeight="694.4" prefWidth="873.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
     <children>
-        <ScatterChart fx:id="signal_chart" animated="false" legendVisible="false" title="Wykres amplitudy sygnału od czasu">
+        <ScatterChart fx:id="resultScatterChart" animated="false" legendVisible="false" title="Wykres amplitudy sygnału od czasu">
             <xAxis>
                 <NumberAxis label="Czas [s] / Próbka" side="BOTTOM" />
             </xAxis>
@@ -21,7 +21,7 @@
             </yAxis>
         </ScatterChart>
         <Separator prefWidth="200.0" />
-        <BarChart fx:id="signal_bar_chart" animated="false" legendVisible="false" title="Histogram amplitudy próbek">
+        <BarChart fx:id="resultBarChart" animated="false" legendVisible="false" title="Histogram amplitudy próbek">
             <xAxis>
                 <CategoryAxis label="Amplituda sygnału" side="BOTTOM" />
             </xAxis>

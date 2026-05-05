@@ -3,22 +3,24 @@ package org.kacperandtobiasz.view.controllers.common;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.ScatterChart;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import org.kacperandtobiasz.model.base.signal.Signal;
-import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.view.MainContext;
 
 public class SignalGraphsController {
+    private final MainContext mainContext;
+
     @FXML
-    public ScatterChart<Number, Number> signal_chart;
+    public ScatterChart<Number, Number> resultScatterChart;
     @FXML
-    public BarChart<Number, Number> signal_bar_chart;
+    public BarChart<Number, Number> resultBarChart;
 
     public SignalGraphsController(MainContext mainContext) {
-        mainContext.graphService().setBarChartInstance(signal_bar_chart);
-        mainContext.graphService().setScatterChartInstance(signal_chart);
+       this.mainContext = mainContext;
+    }
+
+    @FXML
+    private void initialize(){
+        mainContext.graphService().setResultBarChart(resultBarChart);
+        mainContext.graphService().setResultScatterChart(resultScatterChart);
     }
     
 }

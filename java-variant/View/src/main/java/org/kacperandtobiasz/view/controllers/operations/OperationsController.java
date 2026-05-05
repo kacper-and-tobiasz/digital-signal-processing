@@ -11,10 +11,6 @@ import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.view.MainContext;
 
 public class OperationsController {
-
-
-
-
     public OperationsController(MainContext mainContext) {
     }
 }
