@@ -11,6 +11,7 @@ import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.model.util.SignalUtil;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.SignalParameterState;
+import org.kacperandtobiasz.view.SignalSelectionState;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +39,13 @@ public class SignalManagementController {
 
     private final SignalRepository signalRepo;
     private final SignalParameterState signalParameters;
+    private final SignalSelectionState signalSelection;
     private ObservableList<Signal> signals;
 
     public SignalManagementController(MainContext mainContext) {
         this.signalRepo = mainContext.signalRepository();
         this.signalParameters = mainContext.signalParameters();
+        this.signalSelection = mainContext.signalSelection();
     }
 
     @FXML
@@ -50,6 +53,9 @@ public class SignalManagementController {
         if (signalRepo.getSignals() instanceof ObservableList<Signal> signals) {
             this.signals = signals;
             signalSelectorComboBox.setItems(signals);
+        }
+        if (signalSelectorComboBox != null) {
+            signalSelectorComboBox.valueProperty().bindBidirectional(signalSelection.selectedSignal());
         }
         setupControlsInteractions();
     }
@@ -97,62 +103,6 @@ public class SignalManagementController {
 
         signalRepo.addSignal(signal);
         signalSelectorComboBox.getSelectionModel().select(signal);
-    }
-
-    @FXML
-    private void handleGenerateSignal() {
-        Signal targetSignal = signalSelectorComboBox.getSelectionModel().getSelectedItem();
-        if (targetSignal == null) return;
-
-        SignalType type = signalParameters.getSignalType();
-        if (type == null) {
-            throw new IllegalArgumentException("Signal type must be selected");
-        }
-
-        String name = targetSignal.getName();
-        double amp = signalParameters.getAmplitude();
-        double start = signalParameters.getSignalStart();
-        double dur = signalParameters.getSignalDuration();
-        double period = signalParameters.getBasePeriod();
-        double duty = signalParameters.getDutyCycle();
-        double samplingRate = signalParameters.getSamplingRate();
-
-        double jump = signalParameters.getJumpTime();
-        double prob = signalParameters.getProbability();
-
-        int firstSamp = signalParameters.getFirstSample();
-        int jumpSamp = signalParameters.getJumpSample();
-        int sampLen = signalParameters.getSampleLength();
-
-        SignalParameters params = new SignalParameters(amp, start, dur)
-                .withPeriod(period)
-                .withDutyCycle(duty)
-                .withJumpTime(jump)
-                .withProbability(prob)
-                .withFirstSample(firstSamp)
-                .withJumpSample(jumpSamp)
-                .withSampleLength(sampLen);
-
-        Signal newComputedState = SignalFactory.create(type, name, samplingRate, params);
-        targetSignal.setGenerator(newComputedState.getGenerator());
-        targetSignal.setSamplingFrequency(samplingRate);
-        targetSignal.sample();
-//        selectedSignalSampled.set(targetSignal.isSampled());
-//
-//        // Refresh combobox to force cell update if needed (so name etc stay in sync visibly)
-//        int selectedIndex = signalSelectorComboBox.getSelectionModel().getSelectedIndex();
-//        if (selectedIndex >= 0) {
-//            boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == targetSignal);
-//            boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == targetSignal);
-//
-//            signals.set(selectedIndex, targetSignal);
-//
-//            signalSelectorComboBox.getSelectionModel().select(selectedIndex);
-//            if (sel1Match && signal_selector1 != null) signal_selector1.getSelectionModel().select(targetSignal);
-//            if (sel2Match && signal_selector2 != null) signal_selector2.getSelectionModel().select(targetSignal);
-//        }
-//
-//        redrawCharts();
     }
 
     @FXML

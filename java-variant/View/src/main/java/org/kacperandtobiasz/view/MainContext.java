@@ -10,14 +10,16 @@ import org.kacperandtobiasz.view.services.GraphService;
 public record MainContext(
         SignalRepository signalRepository,
         GraphService graphService,
-        SignalParameterState signalParameters
+        SignalParameterState signalParameters,
+        SignalSelectionState signalSelection
 ) {
 
     public MainContext() {
         this(
                 new SignalRepository(FXCollections.observableArrayList()),
                 new GraphService(),
-                new SignalParameterState()
+                new SignalParameterState(),
+                new SignalSelectionState()
         );
     }
 

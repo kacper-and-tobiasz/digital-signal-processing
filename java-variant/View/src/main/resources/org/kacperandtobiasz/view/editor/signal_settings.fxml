@@ -12,7 +12,7 @@
     <children>
         <VBox maxHeight="1.7976931348623157E308" prefWidth="393.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Button fx:id="generate_button" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGenerateSignal" text="Generuj, spróbkuj i narysuj">
+                <Button fx:id="generateButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGenerateSignal" text="Generuj, spróbkuj i narysuj">
                     <VBox.margin>
                         <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                     </VBox.margin>
@@ -22,7 +22,7 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                     </padding>
                 </Separator>
-                <GridPane fx:id="general_signal_settings" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                <GridPane fx:id="generalSignalSettingsPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="196.0" minWidth="10.0" prefWidth="177.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="186.0" />
@@ -46,12 +46,12 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <ComboBox fx:id="signal_type" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="136.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <ComboBox fx:id="signalTypeComboBox" maxWidth="1.7976931348623157E308" prefHeight="25.0" prefWidth="136.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </ComboBox>
-                        <Spinner fx:id="amplitude" amountToStepBy="0.01" editable="true" initialValue="1.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Spinner fx:id="amplitudeSpinner" amountToStepBy="0.01" editable="true" initialValue="1.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
@@ -69,7 +69,7 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <Spinner fx:id="sampling_rate" editable="true" initialValue="100.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Spinner fx:id="samplingRateSpinner" editable="true" initialValue="100.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="3">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
@@ -84,7 +84,7 @@
                         <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                     </padding>
                 </Separator>
-                <VBox fx:id="specific_signal_settings" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+                <VBox fx:id="specificSignalSettingsVBox" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                     <children>
                         <GridPane maxWidth="1.7976931348623157E308">
                             <columnConstraints>
@@ -105,7 +105,7 @@
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
                                 </Label>
-                                <Spinner fx:id="base_period" amountToStepBy="0.1" editable="true" initialValue="1.0" max="100.0" maxWidth="1.7976931348623157E308" min="0.01" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Spinner fx:id="basePeriodSpinner" amountToStepBy="0.1" editable="true" initialValue="1.0" max="100.0" maxWidth="1.7976931348623157E308" min="0.01" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <GridPane.margin>
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
@@ -115,7 +115,7 @@
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
                                 </Label>
-                                <Spinner fx:id="duty_cycle" amountToStepBy="0.1" editable="true" initialValue="0.5" max="1.0" maxWidth="1.7976931348623157E308" min="0.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                <Spinner fx:id="dutyCycleSpinner" amountToStepBy="0.1" editable="true" initialValue="0.5" max="1.0" maxWidth="1.7976931348623157E308" min="0.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                     <GridPane.margin>
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
@@ -125,7 +125,7 @@
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
                                 </Label>
-                                <Spinner fx:id="signal_frequency" amountToStepBy="0.1" editable="true" initialValue="1.0" max="100.0" maxWidth="1.7976931348623157E308" min="0.01" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <Spinner fx:id="frequencySpinner" amountToStepBy="0.1" editable="true" initialValue="1.0" max="100.0" maxWidth="1.7976931348623157E308" min="0.01" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                     <GridPane.margin>
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
@@ -135,7 +135,7 @@
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
                                 </Label>
-                                <Spinner fx:id="signal_start" amountToStepBy="0.01" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                <Spinner fx:id="startTimeSpinner" amountToStepBy="0.01" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                     <GridPane.margin>
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
@@ -145,7 +145,7 @@
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
                                 </Label>
-                                <Spinner fx:id="signal_duration" editable="true" initialValue="5.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                <Spinner fx:id="durationSpinner" editable="true" initialValue="5.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="0.0001" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                     <GridPane.margin>
                                         <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                                     </GridPane.margin>
@@ -180,15 +180,15 @@
                             </rowConstraints>
                             <children>
                                 <Label text="Czas skoku/impulsu (t_s):" GridPane.rowIndex="1" />
-                                <Spinner fx:id="jump_time" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Spinner fx:id="jumpTimeSpinner" editable="true" initialValue="0.0" max="1000000.0" maxWidth="1.7976931348623157E308" min="-1000000.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                 <Label text="Prawdopodobieństwo (p):" GridPane.rowIndex="2" />
-                                <Spinner fx:id="probability" amountToStepBy="0.05" editable="true" initialValue="0.5" max="1.0" maxWidth="1.7976931348623157E308" min="0.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Spinner fx:id="probabilitySpinner" amountToStepBy="0.05" editable="true" initialValue="0.5" max="1.0" maxWidth="1.7976931348623157E308" min="0.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                 <Label text="Numer pierwszej próbki (n_1):" GridPane.rowIndex="3" />
-                                <Spinner fx:id="first_sample" editable="true" initialValue="0" max="1000000" maxWidth="1.7976931348623157E308" min="-1000000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <Spinner fx:id="firstSampleSpinner" editable="true" initialValue="0" max="1000000" maxWidth="1.7976931348623157E308" min="-1000000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                 <Label text="Próbka skoku amplitudy (n_s):" GridPane.rowIndex="4" />
-                                <Spinner fx:id="jump_sample" editable="true" initialValue="0" max="1000000" maxWidth="1.7976931348623157E308" min="-1000000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                <Spinner fx:id="jumpSampleSpinner" editable="true" initialValue="0" max="1000000" maxWidth="1.7976931348623157E308" min="-1000000" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                 <Label text="Liczba próbek (l):" GridPane.rowIndex="5" />
-                                <Spinner fx:id="sample_length" editable="true" initialValue="100" max="1000000" maxWidth="1.7976931348623157E308" min="1" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                <Spinner fx:id="sampleLengthSpinner" editable="true" initialValue="100" max="1000000" maxWidth="1.7976931348623157E308" min="1" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                 <Label maxWidth="1.7976931348623157E308" text="Ustawienia sygnałów dyskretnych" textOverrun="WORD_ELLIPSIS" GridPane.columnSpan="2147483647">
                                     <font>
                                         <Font name="System Bold" size="16.0" />
