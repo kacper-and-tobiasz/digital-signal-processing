@@ -19,8 +19,8 @@ public class SignalGraphsController {
 
     @FXML
     private void initialize(){
-        mainContext.graphService().setResultBarChart(resultBarChart);
-        mainContext.graphService().setResultScatterChart(resultScatterChart);
+        mainContext.graphService().addResultBarChart(resultBarChart);
+        mainContext.graphService().addResultScatterChart(resultScatterChart);
     }
     
 }

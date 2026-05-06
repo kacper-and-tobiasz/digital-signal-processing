@@ -8,9 +8,7 @@ import javafx.stage.FileChooser;
 import org.kacperandtobiasz.model.base.SignalRepository;
 import org.kacperandtobiasz.model.base.signal.*;
 import org.kacperandtobiasz.model.storage.SignalFileHandler;
-import org.kacperandtobiasz.model.util.SignalUtil;
 import org.kacperandtobiasz.view.MainContext;
-import org.kacperandtobiasz.view.SignalParameterState;
 import org.kacperandtobiasz.view.SignalSelectionState;
 
 import java.io.File;

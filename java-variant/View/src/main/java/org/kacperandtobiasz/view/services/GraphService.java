@@ -13,26 +13,26 @@ import java.util.logging.Logger;
 public class GraphService {
     private final List<BarChart> resultBarCharts = new ArrayList<>();
     private final List<ScatterChart<Number, Number>> resultScatterCharts = new ArrayList<>();
-    private Signal currentSignal;
-
     private int histogramBinCount = 10;
 
-    public void setResultBarChart(BarChart barChart) {
+    private Signal resultSignal;
+
+    public void addResultBarChart(BarChart barChart) {
         if (barChart == null)
             throw new NullPointerException("barChart is null");
         if (!resultBarCharts.contains(barChart)) {
             resultBarCharts.add(barChart);
         }
-        drawCurrentSignalBarChart();
+        drawBarChart(resultSignal, barChart);
     }
 
-    public void setResultScatterChart(ScatterChart<Number, Number> scatterChart) {
+    public void addResultScatterChart(ScatterChart<Number, Number> scatterChart) {
         if (scatterChart == null)
             throw new NullPointerException("scatterChart is null");
         if (!resultScatterCharts.contains(scatterChart)) {
             resultScatterCharts.add(scatterChart);
         }
-        drawCurrentSignalScatterChart();
+        drawScatterChart(resultSignal, scatterChart);
     }
 
     public void setHistogramBinCount(int histogramBinCount) {
@@ -40,56 +40,32 @@ public class GraphService {
             histogramBinCount = 1;
         this.histogramBinCount = histogramBinCount;
 
-        drawCurrentSignalGraphs();
+        drawResultSignalGraphs(resultSignal);
     }
 
     public int getHistogramBinCount() {
         return histogramBinCount;
     }
 
-    public void setCurrentSignal(Signal currentSignal) {
-        this.currentSignal = currentSignal;
-        drawCurrentSignalGraphs();
+    public void drawResultSignalGraphs(Signal signal) {
+        resultSignal = signal;
+        for (ScatterChart<Number, Number> chart : resultScatterCharts) {
+            drawScatterChart(resultSignal, chart);
+        }
+
+        for (BarChart chart : resultBarCharts) {
+            drawBarChart(resultSignal, chart);
+        }
     }
 
-    public void drawCurrentSignalGraphs() {
-        if (currentSignal == null)
-            throw new NullPointerException("currentSignal is null");
-        if (!currentSignal.isSampled()) {
+    public void drawScatterChart(Signal signal, ScatterChart<Number, Number> scatterChart){
+        if (signal == null)
+            throw new NullPointerException("Attempted to draw null signal, aborting.");
+        if (!signal.isSampled()) {
             Logger.getGlobal().warning("Attempted to draw unsampled signal, aborting.");
             return;
         }
-
-        drawCurrentSignalBarChart();
-        drawCurrentSignalScatterChart();
-    }
-
-    public void drawCurrentSignalScatterChart(){
-        if (resultScatterCharts.isEmpty())
-            throw new NullPointerException("GraphService has no ScatterChart connected. Set it using setScatterChartInstance() before calling drawSignal().");
-        if (currentSignal == null)
-            return;
-        if (!currentSignal.isSampled())
-            return;
-
-        DiscreteSignal ds = currentSignal.getDiscreteSignal();
-        for (ScatterChart<Number, Number> chart : resultScatterCharts) {
-            drawScatterChart(ds, chart);
-        }
-    }
-
-    public void drawCurrentSignalBarChart(){
-        if (resultBarCharts.isEmpty())
-            throw new NullPointerException("GraphService has no BarChart connected. Set it using setBarChartInstance() before calling drawSignal().");
-        if (currentSignal == null)
-            return;
-        if (!currentSignal.isSampled())
-            return;
-
-        DiscreteSignal ds = currentSignal.getDiscreteSignal();
-        for (BarChart chart : resultBarCharts) {
-            drawBarChart(ds, chart);
-        }
+        drawScatterChart(signal.getDiscreteSignal(), scatterChart);
     }
 
     public void drawScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
@@ -122,9 +98,18 @@ public class GraphService {
         return new MinMax(min, max);
     }
 
-    private void drawBarChart(DiscreteSignal discreteSignal, BarChart barChart){
+    public void drawBarChart(Signal signal, BarChart barChart){
+        if (signal == null)
+            throw new NullPointerException("Attempted to draw null signal, aborting.");
+        if (!signal.isSampled()) {
+            Logger.getGlobal().warning("Attempted to draw unsampled signal, aborting.");
+            return;
+        }
+        drawBarChart(signal.getDiscreteSignal(), barChart);
+    }
+
+    public void drawBarChart(DiscreteSignal discreteSignal, BarChart barChart){
         barChart.getData().clear();
-//        ((CategoryAxis) barChart.getXAxis()).getCategories().clear();
 
         if (discreteSignal.getSampleCount() == 0) {
             return;
@@ -176,14 +161,21 @@ public class GraphService {
 
     private int calculateBinIndex(double value, MinMax minMax) {
         double binWidth = calculateBinWidth(minMax);
-        int binIndex = (int) ((value - minMax.min()) / binWidth);
-        if (binIndex >= histogramBinCount) {
-            binIndex = histogramBinCount - 1;
-            Logger.getGlobal().warning(String.format("Value %.2f exceeds max bin range. Placing in last bin.", value));
+        if (binWidth <= 0) {
+            return 0;
         }
+        if (value <= minMax.min()) {
+            return 0;
+        }
+        if (value >= minMax.max()) {
+            return histogramBinCount - 1;
+        }
+        int binIndex = (int) ((value - minMax.min()) / binWidth);
         if (binIndex < 0) {
-            binIndex = 0;
-            Logger.getGlobal().warning(String.format("Value %.2f exceeds min bin range. Placing in first bin.", value));
+            return 0;
+        }
+        if (binIndex >= histogramBinCount) {
+            return histogramBinCount - 1;
         }
         return binIndex;
     }

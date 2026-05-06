@@ -10,8 +10,8 @@ import org.kacperandtobiasz.view.services.GraphService;
 public record MainContext(
         SignalRepository signalRepository,
         GraphService graphService,
-        SignalParameterState signalParameters,
-        SignalSelectionState signalSelection
+        SignalParameterState signalParameterState,
+        SignalSelectionState signalSelectionState
 ) {
 
     public MainContext() {

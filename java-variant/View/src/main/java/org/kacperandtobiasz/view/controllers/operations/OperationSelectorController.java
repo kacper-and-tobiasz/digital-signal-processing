@@ -39,6 +39,7 @@ public class OperationSelectorController {
     @FXML
     private void initialize() {
         setupGraphSourceListeners();
+        setupControlsInteractions();
     }
 
     private void setupGraphSourceListeners(){

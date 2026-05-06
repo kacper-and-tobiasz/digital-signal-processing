@@ -10,7 +10,6 @@ import org.kacperandtobiasz.model.base.signal.SignalFactory;
 import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.view.MainContext;
-import org.kacperandtobiasz.view.SignalParameterState;
 import org.kacperandtobiasz.view.SignalSelectionState;
 
 public class SignalSettingsController {
@@ -48,21 +47,19 @@ public class SignalSettingsController {
     @FXML
     public VBox specificSignalSettingsVBox;
 
-    private final SignalParameterState signalParameters;
     private final SignalSelectionState signalSelection;
     private final MainContext mainContext;
 
     public SignalSettingsController(MainContext mainContext) {
         this.mainContext = mainContext;
-        this.signalParameters = mainContext.signalParameters();
-        this.signalSelection = mainContext.signalSelection();
+        this.signalSelection = mainContext.signalSelectionState();
     }
 
     @FXML
     private void initialize() {
         setupSignalTypeSelector();
-        bindToContext();
         setupFrequencyPeriodBinding();
+        bindToContext();
     }
 
     @FXML
@@ -70,27 +67,31 @@ public class SignalSettingsController {
         Signal targetSignal = signalSelection.getSelectedSignal();
         if (targetSignal == null) return;
 
-        SignalType type = signalParameters.getSignalType();
+        SignalType type = signalTypeComboBox.getValue();
         if (type == null) {
             throw new IllegalArgumentException("Signal type must be selected");
         }
 
         String name = targetSignal.getName();
-        double amp = signalParameters.getAmplitude();
-        double start = signalParameters.getSignalStart();
-        double dur = signalParameters.getSignalDuration();
-        double period = signalParameters.getBasePeriod();
-        double duty = signalParameters.getDutyCycle();
-        double samplingRate = signalParameters.getSamplingRate();
+        double amp = amplitudeSpinner.getValue();
+        double start = startTimeSpinner.getValue();
+        double dur = durationSpinner.getValue();
+        double period = signalParameterState.getBasePeriod();
+        double duty = signalParameterState.getDutyCycle();
+        double samplingRate = signalParameterState.getSamplingRate();
 
-        double jump = signalParameters.getJumpTime();
-        double prob = signalParameters.getProbability();
+        double jump = signalParameterState.getJumpTime();
+        double prob = signalParameterState.getProbability();
 
-        int firstSamp = signalParameters.getFirstSample();
-        int jumpSamp = signalParameters.getJumpSample();
-        int sampLen = signalParameters.getSampleLength();
+        int firstSamp = signalParameterState.getFirstSample();
+        int jumpSamp = signalParameterState.getJumpSample();
+        int sampLen = signalParameterState.getSampleLength();
 
-        SignalParameters params = new SignalParameters(amp, start, dur)
+        SignalParameters params = new SignalParameters(
+                signalParameterState.getAmplitude(),
+                signalParameterState.getSignalStart(),
+                dur
+        )
                 .withPeriod(period)
                 .withDutyCycle(duty)
                 .withJumpTime(jump)
@@ -104,7 +105,7 @@ public class SignalSettingsController {
         targetSignal.setSamplingFrequency(samplingRate);
         targetSignal.sample();
 
-        mainContext.graphService().setCurrentSignal(targetSignal);
+        mainContext.graphService().drawResultSignalGraphs(targetSignal);
     }
 
 
@@ -137,41 +138,41 @@ public class SignalSettingsController {
 
     private void bindToContext() {
         if (signalTypeComboBox != null) {
-            signalTypeComboBox.valueProperty().bindBidirectional(signalParameters.signalType());
+            signalTypeComboBox.valueProperty().bindBidirectional(signalParameterState.signalType());
         }
 
         if (amplitudeSpinner != null && amplitudeSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(amplitudeSpinner.getValueFactory().valueProperty(), signalParameters.amplitude().asObject());
+            Bindings.bindBidirectional(amplitudeSpinner.getValueFactory().valueProperty(), signalParameterState.amplitude().asObject());
         }
         if (startTimeSpinner != null && startTimeSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(startTimeSpinner.getValueFactory().valueProperty(), signalParameters.signalStart().asObject());
+            Bindings.bindBidirectional(startTimeSpinner.getValueFactory().valueProperty(), signalParameterState.signalStart().asObject());
         }
         if (durationSpinner != null && durationSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(durationSpinner.getValueFactory().valueProperty(), signalParameters.signalDuration().asObject());
+            Bindings.bindBidirectional(durationSpinner.getValueFactory().valueProperty(), signalParameterState.signalDuration().asObject());
         }
         if (basePeriodSpinner != null && basePeriodSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(basePeriodSpinner.getValueFactory().valueProperty(), signalParameters.basePeriod().asObject());
+            Bindings.bindBidirectional(basePeriodSpinner.getValueFactory().valueProperty(), signalParameterState.basePeriod().asObject());
         }
         if (dutyCycleSpinner != null && dutyCycleSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(dutyCycleSpinner.getValueFactory().valueProperty(), signalParameters.dutyCycle().asObject());
+            Bindings.bindBidirectional(dutyCycleSpinner.getValueFactory().valueProperty(), signalParameterState.dutyCycle().asObject());
         }
         if (samplingRateSpinner != null && samplingRateSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(samplingRateSpinner.getValueFactory().valueProperty(), signalParameters.samplingRate().asObject());
+            Bindings.bindBidirectional(samplingRateSpinner.getValueFactory().valueProperty(), signalParameterState.samplingRate().asObject());
         }
         if (jumpTimeSpinner != null && jumpTimeSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(jumpTimeSpinner.getValueFactory().valueProperty(), signalParameters.jumpTime().asObject());
+            Bindings.bindBidirectional(jumpTimeSpinner.getValueFactory().valueProperty(), signalParameterState.jumpTime().asObject());
         }
         if (probabilitySpinner != null && probabilitySpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(probabilitySpinner.getValueFactory().valueProperty(), signalParameters.probability().asObject());
+            Bindings.bindBidirectional(probabilitySpinner.getValueFactory().valueProperty(), signalParameterState.probability().asObject());
         }
         if (firstSampleSpinner != null && firstSampleSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(firstSampleSpinner.getValueFactory().valueProperty(), signalParameters.firstSample().asObject());
+            Bindings.bindBidirectional(firstSampleSpinner.getValueFactory().valueProperty(), signalParameterState.firstSample().asObject());
         }
         if (jumpSampleSpinner != null && jumpSampleSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(jumpSampleSpinner.getValueFactory().valueProperty(), signalParameters.jumpSample().asObject());
+            Bindings.bindBidirectional(jumpSampleSpinner.getValueFactory().valueProperty(), signalParameterState.jumpSample().asObject());
         }
         if (sampleLengthSpinner != null && sampleLengthSpinner.getValueFactory() != null) {
-            Bindings.bindBidirectional(sampleLengthSpinner.getValueFactory().valueProperty(), signalParameters.sampleLength().asObject());
+            Bindings.bindBidirectional(sampleLengthSpinner.getValueFactory().valueProperty(), signalParameterState.sampleLength().asObject());
         }
     }
 
