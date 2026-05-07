@@ -58,14 +58,21 @@ public class GraphService {
         }
     }
 
-    public void drawScatterChart(Signal signal, ScatterChart<Number, Number> scatterChart){
-        if (signal == null)
-            throw new NullPointerException("Attempted to draw null signal, aborting.");
+    private boolean isSignalDrawable(Signal signal){
+        if (signal == null){
+            Logger.getGlobal().warning("Attempted to draw null signal, aborting.");
+            return false;
+        }
         if (!signal.isSampled()) {
             Logger.getGlobal().warning("Attempted to draw unsampled signal, aborting.");
-            return;
+            return false;
         }
-        drawScatterChart(signal.getDiscreteSignal(), scatterChart);
+        return true;
+    }
+
+    public void drawScatterChart(Signal signal, ScatterChart<Number, Number> scatterChart){
+        if(isSignalDrawable(signal))
+            drawScatterChart(signal.getDiscreteSignal(), scatterChart);
     }
 
     public void drawScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
@@ -99,13 +106,8 @@ public class GraphService {
     }
 
     public void drawBarChart(Signal signal, BarChart barChart){
-        if (signal == null)
-            throw new NullPointerException("Attempted to draw null signal, aborting.");
-        if (!signal.isSampled()) {
-            Logger.getGlobal().warning("Attempted to draw unsampled signal, aborting.");
-            return;
-        }
-        drawBarChart(signal.getDiscreteSignal(), barChart);
+        if(isSignalDrawable(signal))
+            drawBarChart(signal.getDiscreteSignal(), barChart);
     }
 
     public void drawBarChart(DiscreteSignal discreteSignal, BarChart barChart){

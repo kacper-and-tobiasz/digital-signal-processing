@@ -36,14 +36,12 @@ public class SignalManagementController {
 
 
     private final SignalRepository signalRepo;
-    private final SignalParameterState signalParameters;
     private final SignalSelectionState signalSelection;
     private ObservableList<Signal> signals;
 
     public SignalManagementController(MainContext mainContext) {
         this.signalRepo = mainContext.signalRepository();
-        this.signalParameters = mainContext.signalParameters();
-        this.signalSelection = mainContext.signalSelection();
+        this.signalSelection = mainContext.signalSelectionState();
     }
 
     @FXML
@@ -90,14 +88,9 @@ public class SignalManagementController {
 
     @FXML
     private void handleCreateSignal() {
-        String newName = signalNameField.getText();
+        String signalName = signalNameField.getText();
 
-        SignalType type = signalParameters.getSignalType();
-        if (type == null) {
-            throw new IllegalArgumentException("Signal type must be selected");
-        }
-
-        Signal signal = new Signal(newName, null, 100.0);
+        Signal signal = new Signal(signalName, null, 100.0);
 
         signalRepo.addSignal(signal);
         signalSelectorComboBox.getSelectionModel().select(signal);
