@@ -128,6 +128,14 @@ public class SignalSettingsController {
     private void setupSignalTypeSelector(){
         signalTypeComboBox.getItems().addAll(SignalType.values());
         signalTypeComboBox.getSelectionModel().select(SignalType.SIN);
+
+        signalTypeComboBox.valueProperty().addListener(
+                (obs, oldVal, newVal) ->
+                        updateControlStates(newVal)
+        );
+
+
+        updateControlStates(signalTypeComboBox.getValue());
     }
 
     private void setupFrequencyPeriodBinding(){
