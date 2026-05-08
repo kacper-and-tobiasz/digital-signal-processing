@@ -61,6 +61,7 @@ public class SignalSettingsController {
     private void initialize() {
         setupSignalTypeSelector();
         setupFrequencyPeriodBinding();
+        setupSignalSettingsAvailability();
     }
 
     @FXML
@@ -74,8 +75,7 @@ public class SignalSettingsController {
         }
 
         double samplingRate = samplingRateSpinner.getValue();
-
-        String name = targetSignal.getName();
+        
         SignalParameters params = new SignalParameters(
                 amplitudeSpinner.getValue(),
                 startTimeSpinner.getValue(),
@@ -162,5 +162,11 @@ public class SignalSettingsController {
                 frequencySpinner.getValueFactory().setValue(0.01);
             }
         });
+    }
+
+    private void setupSignalSettingsAvailability() {
+        generateButton.disableProperty().bind(signalSelection.selectedSignal().isNull());
+        generalSignalSettingsPane.disableProperty().bind(signalSelection.selectedSignal().isNull());
+        specificSignalSettingsVBox.disableProperty().bind(signalSelection.selectedSignal().isNull());
     }
 }
