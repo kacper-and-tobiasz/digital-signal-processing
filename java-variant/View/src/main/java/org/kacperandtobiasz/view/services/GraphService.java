@@ -7,6 +7,8 @@ import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import org.kacperandtobiasz.model.base.signal.Signal;
 
 import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.EventObject;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -14,8 +16,27 @@ public class GraphService {
     private final List<BarChart> resultBarCharts = new ArrayList<>();
     private final List<ScatterChart<Number, Number>> resultScatterCharts = new ArrayList<>();
     private int histogramBinCount = 10;
+    private final List<GraphDrawListener> graphDrawListeners = new ArrayList<>();
 
     private Signal resultSignal;
+
+    public static final class GraphDrawEvent extends EventObject {
+        private final Signal signal;
+
+        public GraphDrawEvent(Object source, Signal signal) {
+            super(source);
+            this.signal = signal;
+        }
+
+        public Signal getSignal() {
+            return signal;
+        }
+    }
+
+    @FunctionalInterface
+    public interface GraphDrawListener extends EventListener {
+        void signalDrawn(GraphDrawEvent event);
+    }
 
     public void addResultBarChart(BarChart barChart) {
         if (barChart == null)
@@ -49,12 +70,32 @@ public class GraphService {
 
     public void drawResultSignalGraphs(Signal signal) {
         resultSignal = signal;
+
         for (ScatterChart<Number, Number> chart : resultScatterCharts) {
             drawScatterChart(resultSignal, chart);
         }
 
         for (BarChart chart : resultBarCharts) {
             drawBarChart(resultSignal, chart);
+        }
+
+        notifySignalDrawn(signal);
+    }
+
+    public void addGraphDrawListener(GraphDrawListener listener) {
+        if (listener != null) {
+            graphDrawListeners.add(listener);
+        }
+    }
+
+    public void removeGraphDrawListener(GraphDrawListener listener) {
+        graphDrawListeners.remove(listener);
+    }
+
+    private void notifySignalDrawn(Signal signal) {
+        GraphDrawEvent event = new GraphDrawEvent(this, signal);
+        for (GraphDrawListener listener : graphDrawListeners) {
+            listener.signalDrawn(event);
         }
     }
 

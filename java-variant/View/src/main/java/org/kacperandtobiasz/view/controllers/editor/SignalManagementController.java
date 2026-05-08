@@ -10,6 +10,7 @@ import org.kacperandtobiasz.model.base.signal.*;
 import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.SignalSelectionState;
+import org.kacperandtobiasz.view.services.GraphService;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,11 +38,13 @@ public class SignalManagementController {
 
     private final SignalRepository signalRepo;
     private final SignalSelectionState signalSelection;
+    private final GraphService graphService;
     private ObservableList<Signal> signals;
 
     public SignalManagementController(MainContext mainContext) {
         this.signalRepo = mainContext.signalRepository();
         this.signalSelection = mainContext.signalSelectionState();
+        this.graphService = mainContext.graphService();
     }
 
     @FXML
@@ -52,6 +55,7 @@ public class SignalManagementController {
         }
         if (signalSelectorComboBox != null) {
             signalSelectorComboBox.valueProperty().bindBidirectional(signalSelection.selectedSignal());
+            signalSelectorComboBox.valueProperty().addListener((obs, oldVal, newVal) -> graphService.drawResultSignalGraphs(newVal));
         }
         setupControlsInteractions();
     }

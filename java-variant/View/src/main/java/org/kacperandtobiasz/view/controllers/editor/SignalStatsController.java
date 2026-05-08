@@ -2,8 +2,6 @@ package org.kacperandtobiasz.view.controllers.editor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TabPane;
 import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.view.MainContext;
 
@@ -19,8 +17,17 @@ public class SignalStatsController {
     @FXML
     public Label stat_variance;
 
-    public SignalStatsController(MainContext mainContext) {
+    private final MainContext mainContext;
 
+    public SignalStatsController(MainContext mainContext) {
+        this.mainContext = mainContext;
+    }
+
+    @FXML
+    private void initialize() {
+        mainContext.signalSelectionState().selectedSignal().addListener((obs, oldVal, newVal) -> updateStatistics(newVal));
+        mainContext.graphService().addGraphDrawListener(event -> updateStatistics(event.getSignal()));
+        updateStatistics(mainContext.signalSelectionState().getSelectedSignal());
     }
 
     private void updateStatistics(Signal signal) {
