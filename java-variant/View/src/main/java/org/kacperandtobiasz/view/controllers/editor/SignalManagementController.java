@@ -11,6 +11,7 @@ import org.kacperandtobiasz.model.storage.SignalFileHandler;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.SignalSelectionState;
 import org.kacperandtobiasz.view.services.GraphService;
+import org.kacperandtobiasz.view.utils.AlertUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,7 +154,7 @@ public class SignalManagementController {
         Signal selected = signalSelectorComboBox.getSelectionModel().getSelectedItem();
 
         if (selected == null || !selected.isSampled()) {
-//            showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
+            AlertUtil.showError("Błąd zapisu", "Sygnał musi być wygenerowany (spróbkowany) przed zapisaniem.");
             return;
         }
 
@@ -166,7 +167,7 @@ public class SignalManagementController {
             try {
                 fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
             } catch (IOException e) {
-//                showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
+                AlertUtil.showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
             }
         }
     }
@@ -180,46 +181,21 @@ public class SignalManagementController {
 
         if (file != null) {
             try {
-                // Read binary file and construct discrete signal
                 DiscreteSignal ds = fileHandler.loadFromBinaryFile(file);
 
-                // Wrap in local Signal entity and generate unique generic name
                 String newName = "Wczytano " + file.getName().replace(".sig", "");
+                String temp = newName;
+                int counter = 1;
+                while(!signalRepo.isSignalNameAvailable(temp)){
+                    temp = newName + "(" + counter + ")";
+                }
                 Signal loadedSignal = new Signal(newName, ds);
 
-                Signal existingSignal = signals.stream()
-                        .filter(s -> s.getName().equals(newName))
-                        .findFirst()
-                        .orElse(null);
-
-                boolean selMainMatch = (signalSelectorComboBox != null && signalSelectorComboBox.getValue() == existingSignal);
-//                boolean sel1Match = (signal_selector1 != null && signal_selector1.getValue() == existingSignal);
-//                boolean sel2Match = (signal_selector2 != null && signal_selector2.getValue() == existingSignal);
-
-                if (existingSignal != null) {
-                    int existingSignalIndex = signals.indexOf(existingSignal);
-                    if (existingSignalIndex >= 0) {
-                        signals.set(existingSignalIndex, loadedSignal);
-                    } else {
-                        signalRepo.addSignal(loadedSignal);
-                    }
-                } else {
-                    signalRepo.addSignal(loadedSignal);
-                }
-
+                signalRepo.addSignal(loadedSignal);
                 signalSelectorComboBox.getSelectionModel().select(loadedSignal);
-
-//                if (sel1Match && signal_selector1 != null) {
-//                    signal_selector1.getSelectionModel().select(loadedSignal);
-//                }
-//                if (sel2Match && signal_selector2 != null) {
-//                    signal_selector2.getSelectionModel().select(loadedSignal);
-//                }
-//
-//                redrawCharts();
-
+//                graphService.drawResultSignalGraphs(loadedSignal);
             } catch (Exception e) {
-//                showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
+                AlertUtil.showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
             }
         }
     }

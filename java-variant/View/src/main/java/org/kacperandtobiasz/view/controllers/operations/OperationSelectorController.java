@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.services.GraphService;
+import org.kacperandtobiasz.view.utils.AlertUtil;
 
 public class OperationSelectorController {
 
@@ -89,7 +90,7 @@ public class OperationSelectorController {
         Signal result = resultSignalSelectorComboBox != null? resultSignalSelectorComboBox.getValue() : null;
 
         if (s1 == null || s2 == null || op == null || result == null) {
-            showError("Błąd operacji", "Upewnij się, że wszystkie sygnały oraz rodzaj operacji zostały wybrane.");
+            AlertUtil.showError("Błąd operacji", "Upewnij się, że wszystkie sygnały oraz rodzaj operacji zostały wybrane.");
             return;
         }
 
@@ -115,7 +116,7 @@ public class OperationSelectorController {
             mainContext.signalSelectionState().setSelectedSignal(result);
 
             if ("Dzielenie".equals(op) && skippedDivisionSamples > 0) {
-                showError(
+                AlertUtil.showError(
                         "Ostrzeżenie dzielenia",
                         "Niektóre próbki zostały zastąpione zerem, ponieważ wartość mianownika była mniejsza niż epsilon. " +
                                 "Liczba takich próbek: " + skippedDivisionSamples + "."
@@ -125,7 +126,7 @@ public class OperationSelectorController {
             redrawCharts(s1, s2, result);
 
         } catch (Exception e) {
-            showError("Błąd kalkulacji sygnałów", e.getMessage());
+            AlertUtil.showError("Błąd kalkulacji sygnałów", e.getMessage());
         }
     }
 
@@ -133,13 +134,5 @@ public class OperationSelectorController {
         graphService.drawResultSignalGraphs(result);
         graphService.drawScatterChart(s1, firstSignalPreviewChart);
         graphService.drawScatterChart(s2, secondSignalPreviewChart);
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Napotkano błąd");
-        alert.setHeaderText(title);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

@@ -33,7 +33,7 @@ public class SignalRepository {
         this.signals = backingList;
     }
 
-    public boolean isSignalNameTaken(String name){
+    private boolean isSignalNameTaken(String name){
         return signals.stream().anyMatch(s -> s.getName().equals(name));
     }
 
