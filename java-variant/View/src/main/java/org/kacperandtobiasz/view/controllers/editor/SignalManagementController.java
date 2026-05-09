@@ -35,6 +35,8 @@ public class SignalManagementController {
     public Button saveButton;
     @FXML
     public Button loadButton;
+    @FXML
+    public Button previewButton;
 
 
     private final SignalRepository signalRepo;
@@ -188,14 +190,47 @@ public class SignalManagementController {
                 int counter = 1;
                 while(!signalRepo.isSignalNameAvailable(temp)){
                     temp = newName + "(" + counter + ")";
+                    counter++;
                 }
-                Signal loadedSignal = new Signal(newName, ds);
+                Signal loadedSignal = new Signal(temp, ds);
 
                 signalRepo.addSignal(loadedSignal);
                 signalSelectorComboBox.getSelectionModel().select(loadedSignal);
 //                graphService.drawResultSignalGraphs(loadedSignal);
             } catch (Exception e) {
                 AlertUtil.showError("Błąd wczytywania", "Nie udało się zdeserializować pliku. Uszkodzone lub brakujące dane.\n" + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handlePreviewSignal() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Podgląd sygnału (binarnie)");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Plik sygnału (*.sig)", "*.sig"));
+        File file = fileChooser.showOpenDialog(null);
+
+        if (file != null) {
+            try {
+                String previewText = fileHandler.generateTextPreview(file, 20);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Podgląd pliku");
+                alert.setHeaderText("Podgląd dla pliku: " + file.getName());
+                
+                TextArea textArea = new TextArea(previewText);
+                textArea.setEditable(false);
+                textArea.setWrapText(true);
+                textArea.setMaxWidth(Double.MAX_VALUE);
+                textArea.setMaxHeight(Double.MAX_VALUE);
+                
+                javafx.scene.layout.GridPane expContent = new javafx.scene.layout.GridPane();
+                expContent.setMaxWidth(Double.MAX_VALUE);
+                expContent.add(textArea, 0, 0);
+                
+                alert.getDialogPane().setContent(expContent);
+                alert.showAndWait();
+            } catch (Exception e) {
+                AlertUtil.showError("Błąd podglądu", "Nie udało się wygenerować podglądu pliku.\n" + e.getMessage());
             }
         }
     }
