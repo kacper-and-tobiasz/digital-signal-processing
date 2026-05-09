@@ -52,16 +52,21 @@
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </ComboBox>
-                        <Label text="Nazwa sygnału wynikowego:" GridPane.rowIndex="5">
+                        <Label text="Sygnał wynikowy:" GridPane.rowIndex="5">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
                         </Label>
-                        <TextField fx:id="result_signal_name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                        <ComboBox fx:id="resultSignalSelectorComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5">
                             <GridPane.margin>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                             </GridPane.margin>
-                        </TextField>
+                        </ComboBox>
+<!--                        <TextField fx:id="result_signal_name" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="5">-->
+<!--                            <GridPane.margin>-->
+<!--                                <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />-->
+<!--                            </GridPane.margin>-->
+<!--                        </TextField>-->
                         <Label maxWidth="1.7976931348623157E308" text="Wybór sygnałów" textOverrun="WORD_ELLIPSIS" GridPane.columnSpan="2">
                             <font>
                                 <Font name="System Bold" size="16.0" />

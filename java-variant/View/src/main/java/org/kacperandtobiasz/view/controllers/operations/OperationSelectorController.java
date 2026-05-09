@@ -1,11 +1,12 @@
 package org.kacperandtobiasz.view.controllers.operations;
 
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.ScatterChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import org.kacperandtobiasz.model.base.signal.Signal;
 import org.kacperandtobiasz.view.MainContext;
 import org.kacperandtobiasz.view.services.GraphService;
@@ -20,8 +21,6 @@ public class OperationSelectorController {
     @FXML
     public ComboBox<Signal> secondSignalSelectorCombobox;
     @FXML
-    public TextField result_signal_name;
-    @FXML
     public ComboBox<String> operation_type;
     @FXML
     public ScatterChart<Number, Number> firstSignalPreviewChart;
@@ -30,6 +29,9 @@ public class OperationSelectorController {
 
     @FXML
     public Button calculateButton;
+
+    @FXML
+    public ComboBox<Signal> resultSignalSelectorComboBox;
 
     public OperationSelectorController(MainContext mainContext) {
         this.mainContext = mainContext;
@@ -40,14 +42,22 @@ public class OperationSelectorController {
     private void initialize() {
         setupGraphSourceListeners();
         setupControlsInteractions();
+
+        if (mainContext.signalRepository().getSignals() instanceof ObservableList<Signal> signals) {
+            firstSignalSelectorComboBox.setItems(signals);
+            secondSignalSelectorCombobox.setItems(signals);
+            resultSignalSelectorComboBox.setItems(signals);
+        }
     }
 
     private void setupGraphSourceListeners(){
         firstSignalSelectorComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            firstSignalPreviewChart.getData().clear();
             graphService.addDataToScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
         });
 
         secondSignalSelectorCombobox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            secondSignalPreviewChart.getData().clear();
             graphService.addDataToScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
         });
     }
@@ -56,8 +66,7 @@ public class OperationSelectorController {
         if (calculateButton != null) {
             calculateButton.disableProperty().bind(
                     Bindings.createBooleanBinding(() -> {
-                        String text = result_signal_name != null ? result_signal_name.getText() : "";
-                        boolean noNames = text == null || text.trim().isEmpty();
+                        boolean noResultSignal = (resultSignalSelectorComboBox == null || resultSignalSelectorComboBox.getValue() == null);
                         boolean noSignal1 = (firstSignalSelectorComboBox == null || firstSignalSelectorComboBox.getValue() == null);
                         boolean noSignal2 = (secondSignalSelectorCombobox == null || secondSignalSelectorCombobox.getValue() == null);
 
@@ -66,14 +75,71 @@ public class OperationSelectorController {
                             notSampled = !firstSignalSelectorComboBox.getValue().isSampled() || !secondSignalSelectorCombobox.getValue().isSampled();
                         }
 
-                        return noNames || noSignal1 || noSignal2 || notSampled;
-                    }, result_signal_name.textProperty(), firstSignalSelectorComboBox.valueProperty(), secondSignalSelectorCombobox.valueProperty())
+                        return noResultSignal || noSignal1 || noSignal2 || notSampled;
+                    }, resultSignalSelectorComboBox.valueProperty(), firstSignalSelectorComboBox.valueProperty(), secondSignalSelectorCombobox.valueProperty())
             );
         }
     }
 
     @FXML
     private void handleCalculateOperation() {
-        //fill
+        Signal s1 = firstSignalSelectorComboBox != null ? firstSignalSelectorComboBox.getValue() : null;
+        Signal s2 = secondSignalSelectorCombobox != null ? secondSignalSelectorCombobox.getValue() : null;
+        String op = operation_type != null ? operation_type.getValue() : null;
+        Signal result = resultSignalSelectorComboBox != null? resultSignalSelectorComboBox.getValue() : null;
+
+        if (s1 == null || s2 == null || op == null || result == null) {
+            showError("Błąd operacji", "Upewnij się, że wszystkie sygnały oraz rodzaj operacji zostały wybrane.");
+            return;
+        }
+
+        try {
+            int skippedDivisionSamples = 0;
+
+            switch (op) {
+                case "Dodawanie":
+                    s1.add(s2, result);
+                    break;
+                case "Odejmowanie":
+                    s1.subtract(s2, result);
+                    break;
+                case "Mnożenie":
+                    s1.multiply(s2, result);
+                    break;
+                case "Dzielenie":
+                    skippedDivisionSamples = s1.countDivisionSkippedSamples(s2);
+                    s1.divide(s2, result);
+                    break;
+            }
+
+            mainContext.signalSelectionState().setSelectedSignal(result);
+
+            if ("Dzielenie".equals(op) && skippedDivisionSamples > 0) {
+                showError(
+                        "Ostrzeżenie dzielenia",
+                        "Niektóre próbki zostały zastąpione zerem, ponieważ wartość mianownika była mniejsza niż epsilon. " +
+                                "Liczba takich próbek: " + skippedDivisionSamples + "."
+                );
+            }
+
+            redrawCharts(s1, s2, result);
+
+        } catch (Exception e) {
+            showError("Błąd kalkulacji sygnałów", e.getMessage());
+        }
+    }
+
+    private void redrawCharts(Signal s1, Signal s2, Signal result) {
+        graphService.drawResultSignalGraphs(result);
+        graphService.drawScatterChart(s1, firstSignalPreviewChart);
+        graphService.drawScatterChart(s2, secondSignalPreviewChart);
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Napotkano błąd");
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

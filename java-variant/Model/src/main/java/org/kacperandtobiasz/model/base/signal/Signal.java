@@ -53,18 +53,19 @@ public class Signal {
         this.discreteSignal = new DiscreteSignal(samples, samplingFrequency, t1);
     }
 
-    public Signal computeOperation(String outputSignalName, Signal other, DoubleBinaryOperator operator){
-        if(other == null){
-            throw new IllegalArgumentException("Cannot compute operation with null signal");
+    public void computeOperation(Signal other, DoubleBinaryOperator operator, Signal outputSignal){
+        if(outputSignal == null || other == null){
+            throw new IllegalArgumentException("All signals have to be selected before completing an operation.");
         }
+
         DiscreteSignal sig1 = this.discreteSignal;
         DiscreteSignal sig2 = other.discreteSignal;
 
         if (sig1 == null || sig2 == null) {
-            throw new IllegalStateException("Both signals must be sampled before addition.");
+            throw new IllegalStateException("Component signals must be sampled before addition.");
         }
         if (sig1.samplingFrequency() != sig2.samplingFrequency()) {
-            throw new IllegalArgumentException("Signals must have the same sampling frequency");
+            throw new IllegalArgumentException("Component signals must have the same sampling frequency");
         }
 
         double samplingFrequency = sig1.samplingFrequency();
@@ -93,30 +94,29 @@ public class Signal {
             samples[i] = operator.applyAsDouble(a, b);
         }
 
-        DiscreteSignal sum = new DiscreteSignal(samples, samplingFrequency, resultStart);
-        String name = outputSignalName == null ? this.name + " x " + other.name : outputSignalName;
-        return new Signal(name, sum);
+        outputSignal.discreteSignal = new DiscreteSignal(samples, samplingFrequency, resultStart);
+        outputSignal.generator = null;
     }
 
-    public Signal add(String outputSignalName, Signal other){
+    public void add(Signal other, Signal outputSignal){
         DoubleBinaryOperator addition = (a, b) -> a + b;
-        return computeOperation(outputSignalName, other, addition);
+        computeOperation(other, addition, outputSignal);
     }
 
 
-    public Signal subtract(String outputSignalName, Signal other){
+    public void subtract(Signal other, Signal outputSignal){
         DoubleBinaryOperator subtraction = (a, b) -> a - b;
-        return computeOperation(outputSignalName, other, subtraction);
+        computeOperation(other, subtraction, outputSignal);
     }
 
-    public Signal multiply(String outputSignalName, Signal other){
+    public void multiply(Signal other, Signal outputSignal){
         DoubleBinaryOperator multiplication = (a, b) -> a * b;
-        return computeOperation(outputSignalName, other, multiplication);
+        computeOperation(other, multiplication, outputSignal);
     }
 
-    public Signal divide(String outputSignalName, Signal other){
+    public void divide(Signal other, Signal outputSignal){
         DoubleBinaryOperator division = (a, b) -> Math.abs(b) < DIVISION_EPSILON ? 0.0 : a / b;
-        return computeOperation(outputSignalName, other, division);
+        computeOperation(other, division, outputSignal);
     }
 
     public int countDivisionSkippedSamples(Signal other) {
