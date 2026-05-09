@@ -44,11 +44,11 @@ public class OperationSelectorController {
 
     private void setupGraphSourceListeners(){
         firstSignalSelectorComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            graphService.drawScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
+            graphService.addDataToScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
         });
 
         secondSignalSelectorCombobox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            graphService.drawScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
+            graphService.addDataToScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
         });
     }
 

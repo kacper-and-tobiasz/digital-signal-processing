@@ -112,14 +112,14 @@ public class GraphService {
     }
 
     public void drawScatterChart(Signal signal, ScatterChart<Number, Number> scatterChart){
+        scatterChart.getData().clear();
         if(isSignalDrawable(signal))
-            drawScatterChart(signal.getDiscreteSignal(), scatterChart);
+            addDataToScatterChart(signal.getDiscreteSignal(), scatterChart);
     }
 
-    public void drawScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
+    public void addDataToScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
         XYChart.Series<Number, Number> scatterSeries = new XYChart.Series<>();
 
-        scatterChart.getData().clear();
         scatterChart.getData().add(scatterSeries);
 
         for (int i = 0; i < ds.getSampleCount(); i++) {
@@ -147,13 +147,12 @@ public class GraphService {
     }
 
     public void drawBarChart(Signal signal, BarChart barChart){
+        barChart.getData().clear();
         if(isSignalDrawable(signal))
-            drawBarChart(signal.getDiscreteSignal(), barChart);
+            addDataToBarChart(signal.getDiscreteSignal(), barChart);
     }
 
-    public void drawBarChart(DiscreteSignal discreteSignal, BarChart barChart){
-        barChart.getData().clear();
-
+    public void addDataToBarChart(DiscreteSignal discreteSignal, BarChart barChart){
         if (discreteSignal.getSampleCount() == 0) {
             return;
         }
