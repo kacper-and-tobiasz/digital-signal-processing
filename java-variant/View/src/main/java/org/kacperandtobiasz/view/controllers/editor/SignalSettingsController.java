@@ -62,6 +62,7 @@ public class SignalSettingsController {
         setupSignalTypeSelector();
         setupFrequencyPeriodBinding();
         setupSignalSettingsAvailability();
+        setupParameterUpdateOnSignalChange();
     }
 
     @FXML
@@ -139,27 +140,20 @@ public class SignalSettingsController {
     }
 
     private void setupFrequencyPeriodBinding(){
-        basePeriodSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+        reverseFractionBind(basePeriodSpinner, frequencySpinner);
+        reverseFractionBind(frequencySpinner, basePeriodSpinner);
+    }
+
+    private void reverseFractionBind(Spinner<Double> baseFractionSpinner, Spinner<Double> reverseFractionSpinner) {
+        baseFractionSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal >= 0.01) {
                 double expectedFreq = 1.0 / newVal;
                 if (expectedFreq < 0.01) expectedFreq = 0.01;
-                if (frequencySpinner.getValue() == null || Math.abs(frequencySpinner.getValue() - expectedFreq) > 1e-6) {
-                    frequencySpinner.getValueFactory().setValue(expectedFreq);
+                if (reverseFractionSpinner.getValue() == null || Math.abs(reverseFractionSpinner.getValue() - expectedFreq) > 1e-6) {
+                    reverseFractionSpinner.getValueFactory().setValue(expectedFreq);
                 }
             } else if (newVal != null && newVal < 0.01) {
-                basePeriodSpinner.getValueFactory().setValue(0.01);
-            }
-        });
-
-        frequencySpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal >= 0.01) {
-                double expectedPeriod = 1.0 / newVal;
-                if (expectedPeriod < 0.01) expectedPeriod = 0.01;
-                if (basePeriodSpinner.getValue() == null || Math.abs(basePeriodSpinner.getValue() - expectedPeriod) > 1e-6) {
-                    basePeriodSpinner.getValueFactory().setValue(expectedPeriod);
-                }
-            } else if (newVal != null && newVal < 0.01) {
-                frequencySpinner.getValueFactory().setValue(0.01);
+                baseFractionSpinner.getValueFactory().setValue(0.01);
             }
         });
     }
@@ -168,5 +162,30 @@ public class SignalSettingsController {
         generateButton.disableProperty().bind(signalSelection.selectedSignal().isNull());
         generalSignalSettingsPane.disableProperty().bind(signalSelection.selectedSignal().isNull());
         specificSignalSettingsVBox.disableProperty().bind(signalSelection.selectedSignal().isNull());
+    }
+
+    private void setupParameterUpdateOnSignalChange() {
+        signalSelection.selectedSignal().addListener((observable, oldVa, newVal) -> {
+            if (newVal != null) {
+                if (newVal.getGenerator() != null) {
+                    SignalParameters params = newVal.getGenerator().getParameters();
+                    signalTypeComboBox.getSelectionModel().select(newVal.getGenerator().getSignalType());
+
+                    amplitudeSpinner.getValueFactory().setValue(params.getAmplitude());
+                    if (startTimeSpinner != null) startTimeSpinner.getValueFactory().setValue(params.getStartTime());
+                    if (durationSpinner != null) durationSpinner.getValueFactory().setValue(params.getDuration());
+
+                    if (basePeriodSpinner != null) basePeriodSpinner.getValueFactory().setValue(params.getPeriod());
+                    if (dutyCycleSpinner != null) dutyCycleSpinner.getValueFactory().setValue(params.getDutyCycle());
+                    if (jumpTimeSpinner != null) jumpTimeSpinner.getValueFactory().setValue(params.getJumpTime());
+                    if (probabilitySpinner != null) probabilitySpinner.getValueFactory().setValue(params.getProbability());
+
+                    if (firstSampleSpinner != null) firstSampleSpinner.getValueFactory().setValue(params.getFirstSample());
+                    if (jumpSampleSpinner != null) jumpSampleSpinner.getValueFactory().setValue(params.getJumpSample());
+                    if (sampleLengthSpinner != null) sampleLengthSpinner.getValueFactory().setValue(params.getSampleLength());
+                }
+                if (samplingRateSpinner != null) samplingRateSpinner.getValueFactory().setValue(newVal.getSamplingFrequency());
+            }
+        });
     }
 }
