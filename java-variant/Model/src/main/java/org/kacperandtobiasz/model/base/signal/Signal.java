@@ -33,11 +33,11 @@ public class Signal {
         this.generator = null;
     }
 
-    public static Signal sampled(String name, SignalGenerator generator, double samplingFrequency) {
-        Signal s = new Signal(name, generator, samplingFrequency);
-        s.sample();
-        return s;
-    }
+//    public static Signal sampled(String name, SignalGenerator generator, double samplingFrequency) {
+//        Signal s = new Signal(name, generator, samplingFrequency);
+//        s.sample();
+//        return s;
+//    }
 
     public void sample() {
         double t1 = generator.getStartTime();
