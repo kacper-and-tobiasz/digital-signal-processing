@@ -4,5 +4,5 @@ import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import org.kacperandtobiasz.model.base.signal.QuantizedRoundedSignal;
 
 public interface Reconstructor {
-    DiscreteSignal reconstruct(QuantizedRoundedSignal signal, double targetSamplingFrequency);
+    DiscreteSignal reconstruct(DiscreteSignal signal, double targetSamplingFrequency);
 }

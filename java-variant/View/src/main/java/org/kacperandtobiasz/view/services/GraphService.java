@@ -15,8 +15,10 @@ import java.util.logging.Logger;
 public class GraphService {
     private final List<BarChart> resultBarCharts = new ArrayList<>();
     private final List<ScatterChart<Number, Number>> resultScatterCharts = new ArrayList<>();
-    private final List<ScatterChart<Number, Number>> quantizationCharts = new ArrayList<>();
-    private final List<ScatterChart<Number, Number>> reconstructionCharts = new ArrayList<>();
+    private ScatterChart<Number, Number> unquantizedReconstructionChart;
+    private ScatterChart<Number, Number> unquantizedNoiseChart;
+    private ScatterChart<Number, Number> quantizedReconstructionChart;
+    private ScatterChart<Number, Number> quantizedNoiseChart;
     private int histogramBinCount = 10;
     private final List<GraphDrawListener> graphDrawListeners = new ArrayList<>();
 
@@ -224,42 +226,65 @@ public class GraphService {
         return binIndex;
     }
 
-    public void addQuantizationChart(ScatterChart<Number, Number> chart) {
-        if (chart == null) throw new NullPointerException("chart is null");
-        if (!quantizationCharts.contains(chart)) {
-            quantizationCharts.add(chart);
+    public void setUnquantizedReconstructionChart(ScatterChart<Number, Number> chart) {
+        this.unquantizedReconstructionChart = chart;
+    }
+
+    public void setUnquantizedNoiseChart(ScatterChart<Number, Number> chart) {
+        this.unquantizedNoiseChart = chart;
+    }
+
+    public void setQuantizedReconstructionChart(ScatterChart<Number, Number> chart) {
+        this.quantizedReconstructionChart = chart;
+    }
+
+    public void setQuantizedNoiseChart(ScatterChart<Number, Number> chart) {
+        this.quantizedNoiseChart = chart;
+    }
+
+    public void drawReconstructionPhaseCharts(Signal signal) {
+        if (unquantizedReconstructionChart != null) unquantizedReconstructionChart.getData().clear();
+        if (unquantizedNoiseChart != null) unquantizedNoiseChart.getData().clear();
+        if (quantizedReconstructionChart != null) quantizedReconstructionChart.getData().clear();
+        if (quantizedNoiseChart != null) quantizedNoiseChart.getData().clear();
+
+        if (signal == null || !signal.isSampled()) return;
+
+        DiscreteSignal original = signal.getHighProbingFrequencyBaseline();
+        if (original == null) return;
+
+        DiscreteSignal unquantizedReconstructed = signal.getUnquantizedReconstructedSignal();
+        DiscreteSignal quantizedReconstructed = signal.getReconstructedSignal();
+
+        if (unquantizedReconstructed != null && unquantizedReconstructionChart != null) {
+            addNamedSeriesToScatterChart(original, "Sygnał oryginalny", unquantizedReconstructionChart, 2000);
+            addNamedSeriesToScatterChart(unquantizedReconstructed, "Zrekonstruowany z próbkowanego", unquantizedReconstructionChart, 2000);
+            
+            DiscreteSignal noise = calculateNoise(original, unquantizedReconstructed);
+            if (noise != null && unquantizedNoiseChart != null) {
+                addNamedSeriesToScatterChart(noise, "Szum", unquantizedNoiseChart, 2000);
+            }
+        }
+
+        if (quantizedReconstructed != null && quantizedReconstructionChart != null) {
+            addNamedSeriesToScatterChart(original, "Sygnał oryginalny", quantizedReconstructionChart, 2000);
+            addNamedSeriesToScatterChart(quantizedReconstructed, "Zrekonstruowany ze skwantowanego", quantizedReconstructionChart, 2000);
+            
+            DiscreteSignal noise = calculateNoise(original, quantizedReconstructed);
+            if (noise != null && quantizedNoiseChart != null) {
+                addNamedSeriesToScatterChart(noise, "Szum", quantizedNoiseChart, 2000);
+            }
         }
     }
 
-    public void addReconstructionChart(ScatterChart<Number, Number> chart) {
-        if (chart == null) throw new NullPointerException("chart is null");
-        if (!reconstructionCharts.contains(chart)) {
-            reconstructionCharts.add(chart);
+    private DiscreteSignal calculateNoise(DiscreteSignal original, DiscreteSignal reconstructed) {
+        int len = Math.min(original.getSampleCount(), reconstructed.getSampleCount());
+        if (len == 0) return null;
+        double[] noiseSamples = new double[len];
+        for (int i = 0; i < len; i++) {
+            noiseSamples[i] = reconstructed.getSample(i) - original.getSample(i);
         }
-    }
-
-    public void drawQuantizationCharts(DiscreteSignal original, DiscreteSignal quantized) {
-        for (ScatterChart<Number, Number> chart : quantizationCharts) {
-            chart.getData().clear();
-            if (original != null) {
-                addNamedSeriesToScatterChart(original, "Sygnał oryginalny", chart, 0);
-            }
-            if (quantized != null) {
-                addNamedSeriesToScatterChart(quantized, "Sygnał skwantyzowany", chart, 0);
-            }
-        }
-    }
-
-    public void drawReconstructionCharts(DiscreteSignal quantized, DiscreteSignal reconstructed) {
-        for (ScatterChart<Number, Number> chart : reconstructionCharts) {
-            chart.getData().clear();
-            if (quantized != null) {
-                addNamedSeriesToScatterChart(quantized, "Sygnał skwantyzowany", chart, 0);
-            }
-            if (reconstructed != null) {
-                addNamedSeriesToScatterChart(reconstructed, "Sygnał zrekonstruowany", chart, 2000);
-            }
-        }
+        return new DiscreteSignal(noiseSamples, original.samplingFrequency(), original.startTime());
     }
 
     private void addNamedSeriesToScatterChart(DiscreteSignal ds, String name,

@@ -47,6 +47,17 @@ public class ReconstructionSettingsController {
     @FXML
     public Label enobTheoreticalLabel;
 
+    @FXML
+    public Label unquantizedMseLabel;
+    @FXML
+    public Label unquantizedSnrLabel;
+    @FXML
+    public Label unquantizedPsnrLabel;
+    @FXML
+    public Label unquantizedMdLabel;
+    @FXML
+    public Label unquantizedEnobLabel;
+
     public ReconstructionSettingsController(MainContext mainContext) {
         this.mainContext = mainContext;
         this.graphService = mainContext.graphService();
@@ -94,19 +105,11 @@ public class ReconstructionSettingsController {
 
     private void updateChartsForSelectedSignal(Signal signal) {
         if (signal == null || !signal.isSampled()) {
-            graphService.drawQuantizationCharts(null, null);
-            graphService.drawReconstructionCharts(null, null);
+            graphService.drawReconstructionPhaseCharts(null);
             return;
         }
 
-        DiscreteSignal original = signal.getDiscreteSignal();
-        DiscreteSignal quantizedDs = signal.isQuantized()
-                ? signal.getQuantizedSignal().toDiscreteSignal()
-                : null;
-        DiscreteSignal reconstructed = signal.getReconstructedSignal();
-
-        graphService.drawQuantizationCharts(original, quantizedDs);
-        graphService.drawReconstructionCharts(quantizedDs, reconstructed);
+        graphService.drawReconstructionPhaseCharts(signal);
     }
 
 
@@ -124,13 +127,10 @@ public class ReconstructionSettingsController {
             QuantizedRoundedSignal quantized = signal.getDiscreteSignal().quantizeWithRounding(bits);
             signal.setQuantizedSignal(quantized);
             signal.setReconstructedSignal(null);
+            signal.setUnquantizedReconstructedSignal(null);
             quantizedFlag.set(true);
 
-            graphService.drawQuantizationCharts(
-                    signal.getDiscreteSignal(),
-                    quantized.toDiscreteSignal()
-            );
-            graphService.drawReconstructionCharts(null, null);
+            graphService.drawReconstructionPhaseCharts(signal);
             clearMetrics();
             refreshButtonStates();
 
@@ -162,14 +162,16 @@ public class ReconstructionSettingsController {
 
             QuantizedRoundedSignal quantized = signal.getQuantizedSignal();
             double targetFrequency = quantized.getSamplingFrequency() * 50;
-            DiscreteSignal reconstructed = reconstructor.reconstruct(quantized, targetFrequency);
+            
+            DiscreteSignal reconstructed = reconstructor.reconstruct(quantized.toDiscreteSignal(), targetFrequency);
             signal.setReconstructedSignal(reconstructed);
 
-            graphService.drawReconstructionCharts(
-                    quantized.toDiscreteSignal(),
-                    reconstructed
-            );
-            updateMetrics(signal.getHighProbingFrequencyBaseline(), reconstructed);
+            DiscreteSignal unquantizedDs = signal.getDiscreteSignal();
+            DiscreteSignal unquantizedReconstructed = reconstructor.reconstruct(unquantizedDs, targetFrequency);
+            signal.setUnquantizedReconstructedSignal(unquantizedReconstructed);
+
+            graphService.drawReconstructionPhaseCharts(signal);
+            updateMetrics(signal.getHighProbingFrequencyBaseline(), reconstructed, unquantizedReconstructed);
             refreshButtonStates();
 
         } catch (Exception e) {
@@ -178,7 +180,7 @@ public class ReconstructionSettingsController {
         }
     }
 
-    private void updateMetrics(DiscreteSignal original, DiscreteSignal reconstructed) {
+    private void updateMetrics(DiscreteSignal original, DiscreteSignal reconstructed, DiscreteSignal unquantizedReconstructed) {
         try {
             mseLabel.setText(String.format("%.6f", SignalMetrics.calculateMSE(original, reconstructed)));
             snrLabel.setText(String.format("%.4f", SignalMetrics.calculateSNR(original, reconstructed)));
@@ -186,6 +188,12 @@ public class ReconstructionSettingsController {
             mdLabel.setText(String.format("%.6f", SignalMetrics.calculateMD(original, reconstructed)));
             enobLabel.setText(String.format("%.4f", SignalMetrics.calculateENOB(original, reconstructed)));
             enobTheoreticalLabel.setText(String.valueOf(bitsSpinner.getValue()));
+            
+            unquantizedMseLabel.setText(String.format("%.6f", SignalMetrics.calculateMSE(original, unquantizedReconstructed)));
+            unquantizedSnrLabel.setText(String.format("%.4f", SignalMetrics.calculateSNR(original, unquantizedReconstructed)));
+            unquantizedPsnrLabel.setText(String.format("%.4f", SignalMetrics.calculatePSNR(original, unquantizedReconstructed)));
+            unquantizedMdLabel.setText(String.format("%.6f", SignalMetrics.calculateMD(original, unquantizedReconstructed)));
+            unquantizedEnobLabel.setText(String.format("%.4f", SignalMetrics.calculateENOB(original, unquantizedReconstructed)));
         } catch (Exception e) {
             System.err.println("Metrics calculation failed: " + e.getMessage());
             e.printStackTrace();
@@ -200,5 +208,10 @@ public class ReconstructionSettingsController {
         mdLabel.setText("-");
         enobLabel.setText("-");
         enobTheoreticalLabel.setText("-");
+        unquantizedMseLabel.setText("-");
+        unquantizedSnrLabel.setText("-");
+        unquantizedPsnrLabel.setText("-");
+        unquantizedMdLabel.setText("-");
+        unquantizedEnobLabel.setText("-");
     }
 }

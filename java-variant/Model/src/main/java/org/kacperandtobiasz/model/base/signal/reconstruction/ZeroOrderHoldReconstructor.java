@@ -6,15 +6,15 @@ import org.kacperandtobiasz.model.base.signal.QuantizedRoundedSignal;
 public class ZeroOrderHoldReconstructor implements Reconstructor {
 
     @Override
-    public DiscreteSignal reconstruct(QuantizedRoundedSignal signal, double targetSamplingFrequency) {
-        double startTime = signal.getStartTime();
+    public DiscreteSignal reconstruct(DiscreteSignal signal, double targetSamplingFrequency) {
+        double startTime = signal.startTime();
         double endTime = signal.getEndTime();
         double duration = endTime - startTime;
 
         int outputSampleCount = (int) Math.floor(duration * targetSamplingFrequency);
         double[] outputSamples = new double[outputSampleCount];
 
-        double sourceSamplingFrequency = signal.getSamplingFrequency();
+        double sourceSamplingFrequency = signal.samplingFrequency();
         int sourceSampleCount = signal.getSampleCount();
 
         for (int i = 0; i < outputSampleCount; i++) {

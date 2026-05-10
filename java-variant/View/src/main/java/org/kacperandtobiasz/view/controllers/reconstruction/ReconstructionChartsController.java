@@ -9,9 +9,13 @@ public class ReconstructionChartsController {
     private final MainContext mainContext;
 
     @FXML
-    public ScatterChart<Number, Number> quantizationChart;
+    public ScatterChart<Number, Number> unquantizedReconstructionChart;
     @FXML
-    public ScatterChart<Number, Number> reconstructionChart;
+    public ScatterChart<Number, Number> unquantizedNoiseChart;
+    @FXML
+    public ScatterChart<Number, Number> quantizedReconstructionChart;
+    @FXML
+    public ScatterChart<Number, Number> quantizedNoiseChart;
 
     public ReconstructionChartsController(MainContext mainContext) {
         this.mainContext = mainContext;
@@ -19,7 +23,9 @@ public class ReconstructionChartsController {
 
     @FXML
     private void initialize() {
-        mainContext.graphService().addQuantizationChart(quantizationChart);
-        mainContext.graphService().addReconstructionChart(reconstructionChart);
+        mainContext.graphService().setUnquantizedReconstructionChart(unquantizedReconstructionChart);
+        mainContext.graphService().setUnquantizedNoiseChart(unquantizedNoiseChart);
+        mainContext.graphService().setQuantizedReconstructionChart(quantizedReconstructionChart);
+        mainContext.graphService().setQuantizedNoiseChart(quantizedNoiseChart);
     }
 }

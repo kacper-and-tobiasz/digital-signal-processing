@@ -5,12 +5,20 @@
 <?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.chart.NumberAxis?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.kacperandtobiasz.view.controllers.reconstruction.ReconstructionChartsController"
-      prefHeight="694.4" prefWidth="873.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="org.kacperandtobiasz.view.controllers.reconstruction.ReconstructionChartsController"
+          prefHeight="694.4" prefWidth="873.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="ALWAYS" percentHeight="50" />
+        <RowConstraints vgrow="ALWAYS" percentHeight="50" />
+    </rowConstraints>
     <children>
-        <ScatterChart fx:id="quantizationChart" animated="false" legendVisible="true" title="Sygnał oryginalny vs kwantyzowany">
+        <ScatterChart fx:id="unquantizedReconstructionChart" animated="false" legendVisible="true" title="Rekonstrukcja z nieskwantyzowanego" GridPane.columnIndex="0" GridPane.rowIndex="0">
             <xAxis>
                 <NumberAxis label="Czas [s]" side="BOTTOM" />
             </xAxis>
@@ -18,8 +26,23 @@
                 <NumberAxis label="Amplituda" side="LEFT" />
             </yAxis>
         </ScatterChart>
-        <Separator prefWidth="200.0" />
-        <ScatterChart fx:id="reconstructionChart" animated="false" legendVisible="true" title="Sygnał kwantyzowany vs zrekonstruowany">
+        <ScatterChart fx:id="unquantizedNoiseChart" animated="false" legendVisible="true" title="Szum (nieskwantyzowany)" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <xAxis>
+                <NumberAxis label="Czas [s]" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Amplituda" side="LEFT" />
+            </yAxis>
+        </ScatterChart>
+        <ScatterChart fx:id="quantizedReconstructionChart" animated="false" legendVisible="true" title="Rekonstrukcja ze skwantyzowanego" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <xAxis>
+                <NumberAxis label="Czas [s]" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Amplituda" side="LEFT" />
+            </yAxis>
+        </ScatterChart>
+        <ScatterChart fx:id="quantizedNoiseChart" animated="false" legendVisible="true" title="Szum (skwantyzowany)" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <xAxis>
                 <NumberAxis label="Czas [s]" side="BOTTOM" />
             </xAxis>
@@ -28,4 +51,4 @@
             </yAxis>
         </ScatterChart>
     </children>
-</VBox>
+</GridPane>

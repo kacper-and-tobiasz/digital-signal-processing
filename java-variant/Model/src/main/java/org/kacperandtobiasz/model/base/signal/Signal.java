@@ -18,6 +18,7 @@ public class Signal {
     private DiscreteSignal highProbingFrequencyBaseline;
     private QuantizedRoundedSignal quantizedSignal;
     private DiscreteSignal reconstructedSignal;
+    private DiscreteSignal unquantizedReconstructedSignal;
 
     private double samplingFrequency;
 
@@ -56,6 +57,7 @@ public class Signal {
         this.discreteSignal = new DiscreteSignal(samples, samplingFrequency, t1);
         this.quantizedSignal = null;
         this.reconstructedSignal = null;
+        this.unquantizedReconstructedSignal = null;
 
         double highFreq = samplingFrequency * 50;
         int nHigh = (int) Math.floor(dur * highFreq);
@@ -268,6 +270,14 @@ public class Signal {
 
     public boolean isReconstructed() {
         return reconstructedSignal != null;
+    }
+
+    public DiscreteSignal getUnquantizedReconstructedSignal() {
+        return unquantizedReconstructedSignal;
+    }
+
+    public void setUnquantizedReconstructedSignal(DiscreteSignal unquantizedReconstructedSignal) {
+        this.unquantizedReconstructedSignal = unquantizedReconstructedSignal;
     }
 
     public double getSamplingFrequency() {
