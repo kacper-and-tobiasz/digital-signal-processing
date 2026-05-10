@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 public class GraphService {
     private final List<BarChart> resultBarCharts = new ArrayList<>();
     private final List<ScatterChart<Number, Number>> resultScatterCharts = new ArrayList<>();
+    private final List<ScatterChart<Number, Number>> quantizationCharts = new ArrayList<>();
+    private final List<ScatterChart<Number, Number>> reconstructionCharts = new ArrayList<>();
     private int histogramBinCount = 10;
     private final List<GraphDrawListener> graphDrawListeners = new ArrayList<>();
 
@@ -220,6 +222,63 @@ public class GraphService {
             return histogramBinCount - 1;
         }
         return binIndex;
+    }
+
+    public void addQuantizationChart(ScatterChart<Number, Number> chart) {
+        if (chart == null) throw new NullPointerException("chart is null");
+        if (!quantizationCharts.contains(chart)) {
+            quantizationCharts.add(chart);
+        }
+    }
+
+    public void addReconstructionChart(ScatterChart<Number, Number> chart) {
+        if (chart == null) throw new NullPointerException("chart is null");
+        if (!reconstructionCharts.contains(chart)) {
+            reconstructionCharts.add(chart);
+        }
+    }
+
+    public void drawQuantizationCharts(DiscreteSignal original, DiscreteSignal quantized) {
+        for (ScatterChart<Number, Number> chart : quantizationCharts) {
+            chart.getData().clear();
+            if (original != null) {
+                addNamedSeriesToScatterChart(original, "Sygnał oryginalny", chart, 0);
+            }
+            if (quantized != null) {
+                addNamedSeriesToScatterChart(quantized, "Sygnał skwantyzowany", chart, 0);
+            }
+        }
+    }
+
+    public void drawReconstructionCharts(DiscreteSignal quantized, DiscreteSignal reconstructed) {
+        for (ScatterChart<Number, Number> chart : reconstructionCharts) {
+            chart.getData().clear();
+            if (quantized != null) {
+                addNamedSeriesToScatterChart(quantized, "Sygnał skwantyzowany", chart, 0);
+            }
+            if (reconstructed != null) {
+                addNamedSeriesToScatterChart(reconstructed, "Sygnał zrekonstruowany", chart, 2000);
+            }
+        }
+    }
+
+    private void addNamedSeriesToScatterChart(DiscreteSignal ds, String name,
+                                              ScatterChart<Number, Number> chart, int maxPoints) {
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(name);
+        chart.getData().add(series);
+
+        int sampleCount = ds.getSampleCount();
+        int step = 1;
+        if (maxPoints > 0 && sampleCount > maxPoints) {
+            step = sampleCount / maxPoints;
+        }
+
+        for (int i = 0; i < sampleCount; i += step) {
+            series.getData().add(
+                    new XYChart.Data<>(ds.getTimeAtIndex(i), ds.getSample(i))
+            );
+        }
     }
 }
 

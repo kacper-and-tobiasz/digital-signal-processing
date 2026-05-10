@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.kacperandtobiasz.model.base.signal.Signal;
-import org.kacperandtobiasz.model.base.signal.SignalFactory;
 import org.kacperandtobiasz.model.base.signal.SignalParameters;
 import org.kacperandtobiasz.model.base.signal.SignalType;
 import org.kacperandtobiasz.model.base.signal.generator.GeneratorFactory;

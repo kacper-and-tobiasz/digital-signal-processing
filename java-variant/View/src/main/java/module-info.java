@@ -16,4 +16,6 @@ module org.kacperandtobiasz.view {
     opens org.kacperandtobiasz.view.controllers.operations to javafx.fxml;
     exports org.kacperandtobiasz.view.controllers.common;
     opens org.kacperandtobiasz.view.controllers.common to javafx.fxml;
+    exports org.kacperandtobiasz.view.controllers.reconstruction;
+    opens org.kacperandtobiasz.view.controllers.reconstruction to javafx.fxml;
 }

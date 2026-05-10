@@ -4,7 +4,19 @@
     -fx-padding: 0.5px;
 }
 
-#resultScatterChart .chart-symbol {
+#resultScatterChart .chart-symbol,
+#quantizationChart .chart-symbol,
+#reconstructionChart .chart-symbol {
     -fx-background-radius: 1.5px;
     -fx-padding: 1.5px;
+}
+
+#quantizationChart .default-color0.chart-symbol,
+#reconstructionChart .default-color0.chart-symbol {
+    -fx-background-color: #2196F3;
+}
+
+#quantizationChart .default-color1.chart-symbol,
+#reconstructionChart .default-color1.chart-symbol {
+    -fx-background-color: #F44336;
 }

@@ -15,6 +15,9 @@ public class Signal {
     private String name;
     private SignalGenerator generator;
     private DiscreteSignal discreteSignal;
+    private DiscreteSignal highProbingFrequencyBaseline;
+    private QuantizedRoundedSignal quantizedSignal;
+    private DiscreteSignal reconstructedSignal;
 
     private double samplingFrequency;
 
@@ -51,6 +54,17 @@ public class Signal {
         }
 
         this.discreteSignal = new DiscreteSignal(samples, samplingFrequency, t1);
+        this.quantizedSignal = null;
+        this.reconstructedSignal = null;
+
+        double highFreq = samplingFrequency * 50;
+        int nHigh = (int) Math.floor(dur * highFreq);
+        double[] highSamples = new double[nHigh];
+        for (int i = 0; i < nHigh; i++) {
+            double t = t1 + i / highFreq;
+            highSamples[i] = generator.getValue(t);
+        }
+        this.highProbingFrequencyBaseline = new DiscreteSignal(highSamples, highFreq, t1);
     }
 
     public void computeOperation(Signal other, DoubleBinaryOperator operator, Signal outputSignal){
@@ -226,6 +240,34 @@ public class Signal {
 
     public boolean isSampled() {
         return discreteSignal != null;
+    }
+
+    public DiscreteSignal getHighProbingFrequencyBaseline() {
+        return highProbingFrequencyBaseline;
+    }
+
+    public QuantizedRoundedSignal getQuantizedSignal() {
+        return quantizedSignal;
+    }
+
+    public void setQuantizedSignal(QuantizedRoundedSignal quantizedSignal) {
+        this.quantizedSignal = quantizedSignal;
+    }
+
+    public boolean isQuantized() {
+        return quantizedSignal != null;
+    }
+
+    public DiscreteSignal getReconstructedSignal() {
+        return reconstructedSignal;
+    }
+
+    public void setReconstructedSignal(DiscreteSignal reconstructedSignal) {
+        this.reconstructedSignal = reconstructedSignal;
+    }
+
+    public boolean isReconstructed() {
+        return reconstructedSignal != null;
     }
 
     public double getSamplingFrequency() {

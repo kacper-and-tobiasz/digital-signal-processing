@@ -43,6 +43,11 @@
                     <fx:include source="operations.fxml" fx:id="operationsTab" />
                 </content>
             </Tab>
+            <Tab text="Rekonstrukcja sygnału">
+                <content>
+                    <fx:include source="reconstruction.fxml" fx:id="reconstructionTab" />
+                </content>
+            </Tab>
         </tabs>
       </TabPane>
    </children>

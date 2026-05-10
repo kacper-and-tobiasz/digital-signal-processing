@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.ScatterChart?>
+<?import javafx.scene.chart.NumberAxis?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.kacperandtobiasz.view.controllers.reconstruction.ReconstructionChartsController"
+      prefHeight="694.4" prefWidth="873.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <children>
+        <ScatterChart fx:id="quantizationChart" animated="false" legendVisible="true" title="Sygnał oryginalny vs kwantyzowany">
+            <xAxis>
+                <NumberAxis label="Czas [s]" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Amplituda" side="LEFT" />
+            </yAxis>
+        </ScatterChart>
+        <Separator prefWidth="200.0" />
+        <ScatterChart fx:id="reconstructionChart" animated="false" legendVisible="true" title="Sygnał kwantyzowany vs zrekonstruowany">
+            <xAxis>
+                <NumberAxis label="Czas [s]" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Amplituda" side="LEFT" />
+            </yAxis>
+        </ScatterChart>
+    </children>
+</VBox>
