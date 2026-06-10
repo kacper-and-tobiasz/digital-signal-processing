@@ -51,6 +51,11 @@
                          <fx:include source="operations/correlation_settings.fxml" fx:id="correlationSettings" />
                       </content>
                    </TitledPane>
+                   <TitledPane animated="false" text="Transformacje">
+                      <content>
+                         <fx:include source="operations/transform_settings.fxml" fx:id="transformSettings" />
+                      </content>
+                   </TitledPane>
                    <TitledPane animated="false" text="Ustawienia wykresów">
                       <content>
                          <fx:include source="common/graph_settings.fxml" fx:id="graphSettings" />

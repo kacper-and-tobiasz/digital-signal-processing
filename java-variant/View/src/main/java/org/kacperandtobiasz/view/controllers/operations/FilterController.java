@@ -82,7 +82,7 @@ public class FilterController {
             AlertUtil.showError("Błąd filtracji", "Wybierz sygnał wejściowy oraz wynikowy.");
             return;
         }
-        if (!input.isSampled()) {
+        if (!input.hasRealSignal()) {
             AlertUtil.showError("Błąd filtracji", "Sygnał wejściowy musi być spróbkowany.");
             return;
         }

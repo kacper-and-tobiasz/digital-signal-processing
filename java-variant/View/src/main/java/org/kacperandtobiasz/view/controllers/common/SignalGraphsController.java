@@ -11,6 +11,8 @@ public class SignalGraphsController {
     @FXML
     public ScatterChart<Number, Number> resultScatterChart;
     @FXML
+    public ScatterChart<Number, Number> complexSecondScatterChart;
+    @FXML
     public BarChart<Number, Number> resultBarChart;
 
     public SignalGraphsController(MainContext mainContext) {
@@ -21,6 +23,7 @@ public class SignalGraphsController {
     private void initialize(){
         mainContext.graphService().addResultBarChart(resultBarChart);
         mainContext.graphService().addResultScatterChart(resultScatterChart);
+        mainContext.graphService().setComplexSecondScatterChart(complexSecondScatterChart);
     }
     
 }

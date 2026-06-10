@@ -70,7 +70,7 @@ public class CorrelationController {
             AlertUtil.showError("Błąd korelacji", "Wybierz oba sygnały wejściowe oraz sygnał wynikowy.");
             return;
         }
-        if (!first.isSampled() || !second.isSampled()) {
+        if (!first.hasRealSignal() || !second.hasRealSignal()) {
             AlertUtil.showError("Błąd korelacji", "Oba sygnały wejściowe muszą być spróbkowane.");
             return;
         }

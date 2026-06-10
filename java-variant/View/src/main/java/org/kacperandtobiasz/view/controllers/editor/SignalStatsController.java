@@ -35,7 +35,7 @@ public class SignalStatsController {
             return;
         }
 
-        if (signal == null || !signal.isSampled()) {
+        if (signal == null || !signal.hasRealSignal()) {
             stat_mean.setText("-");
             stat_abs_mean.setText("-");
             stat_avg_power.setText("-");

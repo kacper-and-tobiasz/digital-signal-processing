@@ -97,14 +97,14 @@ public class ReconstructionSettingsController {
 
     private void refreshButtonStates() {
         Signal selected = signalSelectorComboBox.getValue();
-        quantizeButton.setDisable(selected == null || !selected.isSampled());
+        quantizeButton.setDisable(selected == null || !selected.hasRealSignal());
 
         String method = reconstructionMethodComboBox.getValue();
         reconstructButton.setDisable(!quantizedFlag.get() || method == null);
     }
 
     private void updateChartsForSelectedSignal(Signal signal) {
-        if (signal == null || !signal.isSampled()) {
+        if (signal == null || !signal.hasRealSignal()) {
             graphService.drawReconstructionPhaseCharts(null);
             return;
         }
@@ -117,7 +117,7 @@ public class ReconstructionSettingsController {
     @FXML
     private void handleQuantize() {
         Signal signal = signalSelectorComboBox.getValue();
-        if (signal == null || !signal.isSampled()) {
+        if (signal == null || !signal.hasRealSignal()) {
             AlertUtil.showError("Błąd kwantyzacji", "Wybrany sygnał nie jest spróbkowany.");
             return;
         }

@@ -167,7 +167,7 @@ public class SignalManagementController {
 
         if (file != null) {
             try {
-                fileHandler.saveToBinaryFile(selected.getDiscreteSignal(), file);
+                fileHandler.saveToBinaryFile(selected, file);
             } catch (IOException e) {
                 AlertUtil.showError("Błąd zapisu", "Nie udało się zapisać pliku.\n" + e.getMessage());
             }
@@ -183,8 +183,6 @@ public class SignalManagementController {
 
         if (file != null) {
             try {
-                DiscreteSignal ds = fileHandler.loadFromBinaryFile(file);
-
                 String newName = "Wczytano " + file.getName().replace(".sig", "");
                 String temp = newName;
                 int counter = 1;
@@ -192,7 +190,7 @@ public class SignalManagementController {
                     temp = newName + "(" + counter + ")";
                     counter++;
                 }
-                Signal loadedSignal = new Signal(temp, ds);
+                Signal loadedSignal = fileHandler.loadSignalFromBinaryFile(file, temp);
 
                 signalRepo.addSignal(loadedSignal);
                 signalSelectorComboBox.getSelectionModel().select(loadedSignal);

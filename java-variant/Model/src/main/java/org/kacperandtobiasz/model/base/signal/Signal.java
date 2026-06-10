@@ -19,6 +19,7 @@ public class Signal {
     private QuantizedRoundedSignal quantizedSignal;
     private DiscreteSignal reconstructedSignal;
     private DiscreteSignal unquantizedReconstructedSignal;
+    private ComplexSignal complexSignal;
 
     private double samplingFrequency;
 
@@ -34,6 +35,14 @@ public class Signal {
         this.name = name;
         this.discreteSignal = discreteSignal;
         this.samplingFrequency = discreteSignal.samplingFrequency();
+        this.generator = null;
+    }
+
+    public Signal(String name, ComplexSignal complexSignal) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.complexSignal = complexSignal;
+        this.samplingFrequency = complexSignal.samplingFrequency();
         this.generator = null;
     }
 
@@ -58,6 +67,7 @@ public class Signal {
         this.quantizedSignal = null;
         this.reconstructedSignal = null;
         this.unquantizedReconstructedSignal = null;
+        this.complexSignal = null;
 
         double highFreq = samplingFrequency * 50;
         int nHigh = (int) Math.floor(dur * highFreq);
@@ -235,6 +245,7 @@ public class Signal {
     public void setDiscreteSignal(DiscreteSignal discreteSignal) {
         this.discreteSignal = discreteSignal;
         this.generator = null;
+        this.complexSignal = null;
         this.quantizedSignal = null;
         this.reconstructedSignal = null;
         this.unquantizedReconstructedSignal = null;
@@ -252,7 +263,35 @@ public class Signal {
     }
 
     public boolean isSampled() {
+        return discreteSignal != null || complexSignal != null;
+    }
+
+    public boolean hasRealSignal() {
         return discreteSignal != null;
+    }
+
+    public boolean hasComplexSignal() {
+        return complexSignal != null;
+    }
+
+    public ComplexSignal getComplexSignal() {
+        if (complexSignal == null) {
+            throw new IllegalStateException("Signal has no complex values.");
+        }
+        return complexSignal;
+    }
+
+    public void setComplexSignal(ComplexSignal complexSignal) {
+        this.complexSignal = complexSignal;
+        this.discreteSignal = null;
+        this.generator = null;
+        this.quantizedSignal = null;
+        this.reconstructedSignal = null;
+        this.unquantizedReconstructedSignal = null;
+        this.highProbingFrequencyBaseline = null;
+        if (complexSignal != null) {
+            this.samplingFrequency = complexSignal.samplingFrequency();
+        }
     }
 
     public DiscreteSignal getHighProbingFrequencyBaseline() {
@@ -307,11 +346,20 @@ public class Signal {
     public Signal deepCopy() {
         Signal cloned = new Signal(this.name, this.generator != null ? this.generator.clone() : null, this.samplingFrequency);
         if (this.isSampled()) {
-            cloned.discreteSignal = new DiscreteSignal(
-                    this.discreteSignal.samples(), 
-                    this.discreteSignal.samplingFrequency(), 
-                    this.discreteSignal.startTime()
-            );
+            if (this.discreteSignal != null) {
+                cloned.discreteSignal = new DiscreteSignal(
+                        this.discreteSignal.samples(),
+                        this.discreteSignal.samplingFrequency(),
+                        this.discreteSignal.startTime()
+                );
+            }
+            if (this.complexSignal != null) {
+                cloned.complexSignal = new ComplexSignal(
+                        this.complexSignal.samples(),
+                        this.complexSignal.samplingFrequency(),
+                        this.complexSignal.startFrequency()
+                );
+            }
         }
         return cloned;
     }

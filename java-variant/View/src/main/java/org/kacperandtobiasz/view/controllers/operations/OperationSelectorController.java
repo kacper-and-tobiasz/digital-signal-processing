@@ -54,14 +54,14 @@ public class OperationSelectorController {
     private void setupGraphSourceListeners(){
         firstSignalSelectorComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             firstSignalPreviewChart.getData().clear();
-            if (newVal != null && newVal.isSampled()) {
+            if (newVal != null && newVal.hasRealSignal()) {
                 graphService.addDataToScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
             }
         });
 
         secondSignalSelectorCombobox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             secondSignalPreviewChart.getData().clear();
-            if (newVal != null && newVal.isSampled()) {
+            if (newVal != null && newVal.hasRealSignal()) {
                 graphService.addDataToScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
             }
         });
@@ -77,7 +77,7 @@ public class OperationSelectorController {
 
                         boolean notSampled = false;
                         if (!noSignal1 && !noSignal2) {
-                            notSampled = !firstSignalSelectorComboBox.getValue().isSampled() || !secondSignalSelectorCombobox.getValue().isSampled();
+                            notSampled = !firstSignalSelectorComboBox.getValue().hasRealSignal() || !secondSignalSelectorCombobox.getValue().hasRealSignal();
                         }
 
                         return noResultSignal || noSignal1 || noSignal2 || notSampled;

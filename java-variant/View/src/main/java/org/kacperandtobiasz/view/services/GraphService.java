@@ -3,6 +3,8 @@ package org.kacperandtobiasz.view.services;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
+import org.kacperandtobiasz.model.base.signal.ComplexNumber;
+import org.kacperandtobiasz.model.base.signal.ComplexSignal;
 import org.kacperandtobiasz.model.base.signal.DiscreteSignal;
 import org.kacperandtobiasz.model.base.signal.Signal;
 
@@ -19,6 +21,8 @@ public class GraphService {
     private ScatterChart<Number, Number> unquantizedNoiseChart;
     private ScatterChart<Number, Number> quantizedReconstructionChart;
     private ScatterChart<Number, Number> quantizedNoiseChart;
+    private ScatterChart<Number, Number> complexSecondScatterChart;
+    private String complexViewMode = "W1";
     private int histogramBinCount = 10;
     private final List<GraphDrawListener> graphDrawListeners = new ArrayList<>();
 
@@ -66,6 +70,10 @@ public class GraphService {
         this.histogramBinCount = histogramBinCount;
 
         drawResultSignalGraphs(resultSignal);
+    }
+
+    public void setComplexViewMode(String complexViewMode) {
+        this.complexViewMode = complexViewMode == null ? "W1" : complexViewMode;
     }
 
     public int getHistogramBinCount() {
@@ -117,8 +125,19 @@ public class GraphService {
 
     public void drawScatterChart(Signal signal, ScatterChart<Number, Number> scatterChart){
         scatterChart.getData().clear();
-        if(isSignalDrawable(signal))
-            addDataToScatterChart(signal.getDiscreteSignal(), scatterChart);
+        if (complexSecondScatterChart != null) {
+            complexSecondScatterChart.getData().clear();
+            complexSecondScatterChart.setManaged(false);
+            complexSecondScatterChart.setVisible(false);
+        }
+        if (isSignalDrawable(signal)) {
+            if (signal.hasComplexSignal()) {
+                addComplexDataToScatterCharts(signal.getComplexSignal(), scatterChart);
+            } else {
+                scatterChart.setTitle("Wykres amplitudy sygnału od czasu");
+                addDataToScatterChart(signal.getDiscreteSignal(), scatterChart);
+            }
+        }
     }
 
     public void addDataToScatterChart(DiscreteSignal ds, ScatterChart<Number, Number> scatterChart) {
@@ -152,8 +171,54 @@ public class GraphService {
 
     public void drawBarChart(Signal signal, BarChart barChart){
         barChart.getData().clear();
-        if(isSignalDrawable(signal))
+        boolean realSignal = isSignalDrawable(signal) && signal.hasRealSignal();
+        barChart.setManaged(realSignal);
+        barChart.setVisible(realSignal);
+        if(realSignal)
             addDataToBarChart(signal.getDiscreteSignal(), barChart);
+    }
+
+    public void setComplexSecondScatterChart(ScatterChart<Number, Number> chart) {
+        this.complexSecondScatterChart = chart;
+    }
+
+    private void addComplexDataToScatterCharts(ComplexSignal signal, ScatterChart<Number, Number> firstChart) {
+        XYChart.Series<Number, Number> firstSeries = new XYChart.Series<>();
+        XYChart.Series<Number, Number> secondSeries = new XYChart.Series<>();
+
+        firstChart.getData().add(firstSeries);
+        if (complexSecondScatterChart != null) {
+            complexSecondScatterChart.setManaged(true);
+            complexSecondScatterChart.setVisible(true);
+            complexSecondScatterChart.getData().add(secondSeries);
+        }
+
+        boolean magnitudePhase = "W2".equals(complexViewMode);
+        firstChart.setTitle(magnitudePhase ? "Moduł w funkcji częstotliwości" : "Część rzeczywista w funkcji częstotliwości");
+        if (complexSecondScatterChart != null) {
+            complexSecondScatterChart.setTitle(magnitudePhase ? "Argument w funkcji częstotliwości" : "Część urojona w funkcji częstotliwości");
+        }
+
+        int visibleSampleCount = signal.getSampleCount();
+        double maxMagnitude = 0.0;
+        if (magnitudePhase) {
+            for (int i = 0; i < visibleSampleCount; i++) {
+                maxMagnitude = Math.max(maxMagnitude, signal.getSample(i).magnitude());
+            }
+        }
+        double phaseThreshold = Math.max(1e-10, maxMagnitude * 0.01);
+
+        for (int i = 0; i < visibleSampleCount; i++) {
+            ComplexNumber sample = signal.getSample(i);
+            double x = signal.getFrequencyAtIndex(i);
+            firstSeries.getData().add(new XYChart.Data<>(x, magnitudePhase ? sample.magnitude() : sample.real()));
+            if (complexSecondScatterChart != null) {
+                double secondValue = magnitudePhase
+                        ? sample.magnitude() < phaseThreshold ? 0.0 : sample.phase()
+                        : sample.imaginary();
+                secondSeries.getData().add(new XYChart.Data<>(x, secondValue));
+            }
+        }
     }
 
     public void addDataToBarChart(DiscreteSignal discreteSignal, BarChart barChart){

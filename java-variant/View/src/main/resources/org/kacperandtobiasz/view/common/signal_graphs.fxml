@@ -20,6 +20,14 @@
                 <NumberAxis label="Amplituda" side="LEFT" />
             </yAxis>
         </ScatterChart>
+        <ScatterChart fx:id="complexSecondScatterChart" animated="false" legendVisible="false" managed="false" visible="false" title="Wykres zespolony">
+            <xAxis>
+                <NumberAxis label="Częstotliwość [Hz]" side="BOTTOM" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Wartość" side="LEFT" />
+            </yAxis>
+        </ScatterChart>
         <Separator prefWidth="200.0" />
         <BarChart fx:id="resultBarChart" animated="false" legendVisible="false" title="Histogram amplitudy próbek">
             <xAxis>
