@@ -110,8 +110,7 @@ public class Signal {
             samples[i] = operator.applyAsDouble(a, b);
         }
 
-        outputSignal.discreteSignal = new DiscreteSignal(samples, samplingFrequency, resultStart);
-        outputSignal.generator = null;
+        outputSignal.setDiscreteSignal(new DiscreteSignal(samples, samplingFrequency, resultStart));
     }
 
     public void add(Signal other, Signal outputSignal){
@@ -231,6 +230,18 @@ public class Signal {
     public void setGenerator(SignalGenerator generator) {
         this.generator = generator;
         this.discreteSignal = null;
+    }
+
+    public void setDiscreteSignal(DiscreteSignal discreteSignal) {
+        this.discreteSignal = discreteSignal;
+        this.generator = null;
+        this.quantizedSignal = null;
+        this.reconstructedSignal = null;
+        this.unquantizedReconstructedSignal = null;
+        this.highProbingFrequencyBaseline = null;
+        if (discreteSignal != null) {
+            this.samplingFrequency = discreteSignal.samplingFrequency();
+        }
     }
 
     public DiscreteSignal getDiscreteSignal() {

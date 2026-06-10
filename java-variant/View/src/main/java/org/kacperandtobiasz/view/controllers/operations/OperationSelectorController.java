@@ -54,12 +54,16 @@ public class OperationSelectorController {
     private void setupGraphSourceListeners(){
         firstSignalSelectorComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             firstSignalPreviewChart.getData().clear();
-            graphService.addDataToScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
+            if (newVal != null && newVal.isSampled()) {
+                graphService.addDataToScatterChart(newVal.getDiscreteSignal(), firstSignalPreviewChart);
+            }
         });
 
         secondSignalSelectorCombobox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             secondSignalPreviewChart.getData().clear();
-            graphService.addDataToScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
+            if (newVal != null && newVal.isSampled()) {
+                graphService.addDataToScatterChart(newVal.getDiscreteSignal(), secondSignalPreviewChart);
+            }
         });
     }
 
@@ -79,6 +83,10 @@ public class OperationSelectorController {
                         return noResultSignal || noSignal1 || noSignal2 || notSampled;
                     }, resultSignalSelectorComboBox.valueProperty(), firstSignalSelectorComboBox.valueProperty(), secondSignalSelectorCombobox.valueProperty())
             );
+        }
+
+        if (operation_type != null && operation_type.getItems().size() > 0) {
+            operation_type.getSelectionModel().selectFirst();
         }
     }
 

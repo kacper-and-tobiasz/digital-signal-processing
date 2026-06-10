@@ -36,14 +36,24 @@
          <children>
             <Accordion prefHeight="694.4" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <panes>
-                  <TitledPane animated="false" text="Wybór sygnału i operacji">
-                     <content>
-                        <fx:include source="operations/operation_selector.fxml" fx:id="operationSelector" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane animated="false" text="Ustawienia wykresów">
-                     <content>
-                        <fx:include source="common/graph_settings.fxml" fx:id="graphSettings" />
+                   <TitledPane animated="false" text="Operacje arytmetyczne">
+                      <content>
+                         <fx:include source="operations/operation_selector.fxml" fx:id="operationSelector" />
+                      </content>
+                   </TitledPane>
+                   <TitledPane animated="false" text="Filtrowanie sygnału">
+                      <content>
+                         <fx:include source="operations/filter_settings.fxml" fx:id="filterSettings" />
+                      </content>
+                   </TitledPane>
+                   <TitledPane animated="false" text="Korelacja sygnałów">
+                      <content>
+                         <fx:include source="operations/correlation_settings.fxml" fx:id="correlationSettings" />
+                      </content>
+                   </TitledPane>
+                   <TitledPane animated="false" text="Ustawienia wykresów">
+                      <content>
+                         <fx:include source="common/graph_settings.fxml" fx:id="graphSettings" />
                      </content>
                   </TitledPane>
                </panes>
